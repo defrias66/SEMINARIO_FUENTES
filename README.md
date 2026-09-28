@@ -1,1 +1,1 @@
-# Relación entre iluminación artificial y diabetes por comunidades autónomas en España
+# Relación entre iluminación artificial nocturna y diabetes tipo 2 por comunidades autónomas en España
