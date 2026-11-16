@@ -47,3 +47,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Tabla mundial de luz nocturna (unos 233 MB): no cabe en GitHub.
+# Se lee desde su URL y solo se guarda la parte de España.
+INPUT/DATA/ntl_adm2_annual.csv
