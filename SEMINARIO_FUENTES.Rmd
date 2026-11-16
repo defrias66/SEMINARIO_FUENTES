@@ -1,0 +1,61 @@
+---
+title: "Iluminación artificial nocturna y diabetes en las comunidades autónomas de España (2023)"
+author: "Diego Medel, Pablo de Frías y Mikel Lasa"
+date: "23 de noviembre de 2026"
+output: html_document
+---
+
+Fuentes de Datos Biomédicos y Web Semántica. 3.º del grado en Ingeniería Biomédica, Universidad de Burgos. Curso 2026-2027.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r librerias}
+library(readr)
+library(dplyr)
+```
+
+# Introducción
+
+<!-- Paso 7 (Mikel) -->
+Pendiente.
+
+# Objetivo general y objetivos específicos
+
+<!-- Paso 8 (Diego) -->
+
+## Objetivo general
+
+Pendiente.
+
+## Objetivos específicos
+
+Pendiente.
+
+# Metodología y resultados
+
+## Objetivo 1: diabetes por comunidad autónoma
+
+<!-- Paso 9 (Pablo) -->
+Pendiente.
+
+## Objetivo 2: luz nocturna por comunidad autónoma
+
+<!-- Paso 10 (Mikel) -->
+Pendiente.
+
+## Objetivo 3: relación entre la luz nocturna y la diabetes
+
+<!-- Paso 11 (Diego) -->
+Pendiente.
+
+# Conclusiones generales
+
+<!-- Paso 12 (Pablo) -->
+Pendiente.
+
+# Referencias
+
+<!-- Paso 13 (Mikel) -->
+Pendiente.
