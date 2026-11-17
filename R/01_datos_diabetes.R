@@ -41,6 +41,20 @@ Diabetes_CCAA <-
   select(comunidad, diabetes_pct = valor) %>% 
   arrange(comunidad)
 
+
+# * De texto a número -----------------------------------------------------
+# La columna llega como texto porque la tabla del INE usa ".." en las casillas
+# sin muestra suficiente, y eso obliga a R a leer toda la columna como texto.
+# parse_number() la convierte a número indicando que la coma es el decimal.
+class(Diabetes_CCAA$diabetes_pct)
+
+Diabetes_CCAA <- 
+  Diabetes_CCAA %>% 
+  mutate(diabetes_pct = round(parse_number(diabetes_pct,
+                                           locale = locale(decimal_mark = ",")), 2))
+
+class(Diabetes_CCAA$diabetes_pct)
+
 # * Comprobación ----------------------------------------------------------
 # Tienen que salir 19 filas (17 comunidades + Ceuta + Melilla)
 # y Andalucía con 7.83.
