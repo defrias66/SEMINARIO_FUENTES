@@ -11,7 +11,7 @@ Estudiar si hay relación entre la luz artificial durante la noche y el porcenta
 ## Fuentes de datos
 
 - Diabetes: Instituto Nacional de Estadística (INE), Encuesta de Salud de España 2023, [tabla 71554](https://www.ine.es/jaxi/Tabla.htm?L=0&tpx=71554). Porcentaje de personas de 15 años o más con enfermedades crónicas diagnosticadas por un médico, por sexo y comunidad autónoma.
-- Iluminación nocturna: Banco Mundial, [Space2Stats Monthly & Annual Black Marble Nighttime Lights](https://datacatalog.worldbank.org/search/dataset/0066940/space2stats-monthly-annual-black-marble-nighttime-lights), con mediciones de NASA Black Marble por provincias.
+- Iluminación nocturna: Banco Mundial, [Space2Stats Monthly & Annual Black Marble Nighttime Lights](https://datacatalogfiles.worldbank.org/ddh-published/0066940/DR0095685/ntl_adm2_annual.csv), con mediciones de NASA Black Marble por provincias.
 
 ## Estructura del repositorio
 
