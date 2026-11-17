@@ -18,8 +18,13 @@ library(dplyr)
 
 # Introducción
 
-<!-- Paso 7 (Mikel) -->
-Pendiente.
+La luz artificial nocturna es la luz de las calles, edificios y carreteras que permanece encendida por la noche. Hoy es tan habitual que gran parte de la población vive sin una noche realmente oscura. Además de ser un problema ambiental, se estudia como un posible factor de riesgo para la salud.
+
+El motivo es el reloj biológico. Nuestro cuerpo sigue un ritmo de unas 24 horas (ritmo circadiano) que se ajusta sobre todo con la luz del día. Cuando hay luz por la noche, este reloj se desajusta, baja la secreción de melatonina y empeora el sueño. Con el tiempo, ese desajuste se ha relacionado con alteraciones del metabolismo, como la obesidad, el síndrome metabólico y la diabetes (Touitou et al., 2017; Meléndez-Fernández et al., 2023).
+
+Varios estudios han medido la luz nocturna exterior con imágenes de satélite y la han comparado con la diabetes. En China, un estudio con 98.658 adultos de 162 zonas encontró que en las zonas con más luz nocturna la diabetes era un 28 % más frecuente que en las zonas con menos luz (Zheng et al., 2023). Otro estudio, que siguió a 283.374 personas durante varios años, observó que quienes vivían en las zonas más iluminadas tenían más riesgo de desarrollar diabetes tipo 2 (Xu et al., 2023).
+
+Sin embargo, la mayoría de estos trabajos se han hecho fuera de España y con datos de cada persona. No hemos encontrado ningún estudio que compare la luz nocturna y la diabetes entre las comunidades autónomas españolas con datos públicos recientes. Por eso, en este seminario nos preguntamos si las comunidades con más luz artificial nocturna en 2023 son también las que tienen un mayor porcentaje de personas con diabetes. Para responderlo usamos dos fuentes abiertas: la Encuesta de Salud de España 2023 del INE, para la diabetes, y los datos de luz nocturna por satélite (Black Marble) que publica el Banco Mundial.
 
 # Objetivo general y objetivos específicos
 
