@@ -42,17 +42,80 @@ Analizar si la exposición a luz artificial nocturna se relaciona con la prevale
 
 # Metodología y resultados
 
-## Objetivo 1: diabetes por comunidad autónoma
+## Objetivo 1: Diabetes por comunidad autónoma
 
-<!-- Paso 9 (Pablo) -->
-Pendiente.
+### Datos
 
-## Objetivo 2: luz nocturna por comunidad autónoma
+```{r leer-diabetes}
+datos <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
+```
+
+### Tabla ordenada
+
+```{r tabla-diabetes}
+tabla_diabetes <- datos %>%
+  select(comunidad, diabetes_pct) %>%
+  arrange(desc(diabetes_pct)) %>%
+  mutate(puesto = row_number()) %>%
+  select(puesto, comunidad, diabetes_pct)
+
+knitr::kable(tabla_diabetes,
+             col.names = c("Puesto", "Comunidad", "Diabetes (%)"),
+             caption = "Comunidades ordenadas de mayor a menor porcentaje de diabetes (2023)")
+```
+
+### Resumen numérico
+
+```{r resumen-diabetes}
+resumen <- datos %>%
+  summarise(n       = n(),
+            media   = mean(diabetes_pct),
+            mediana = median(diabetes_pct),
+            desv    = sd(diabetes_pct),
+            minimo  = min(diabetes_pct),
+            q1      = quantile(diabetes_pct, 0.25),
+            q3      = quantile(diabetes_pct, 0.75),
+            maximo  = max(diabetes_pct))
+
+knitr::kable(resumen, digits = 2,
+             caption = "Resumen estadístico del porcentaje de diabetes por comunidad")
+
+# Para el texto
+com_max <- tabla_diabetes$comunidad[1]
+com_min <- tabla_diabetes$comunidad[nrow(tabla_diabetes)]
+```
+
+### Gráfico
+```{r librerias-graficos}
+library(tidyverse)
+```
+
+```{r grafico-diabetes, fig.height=7, fig.width=8}
+ggplot(tabla_diabetes,
+       aes(x = reorder(comunidad, diabetes_pct), y = diabetes_pct)) +
+  geom_col(fill = "steelblue") +
+  geom_hline(yintercept = mean(tabla_diabetes$diabetes_pct),
+             linetype = "dashed", colour = "red") +
+  coord_flip() +
+  labs(title = "Diabetes por comunidad autónoma (2023)",
+       subtitle = "La línea roja marca la media de las 19 comunidades",
+       x = NULL,
+       y = "Diabetes (%)") +
+  theme_minimal()
+```
+
+### Descripción
+
+Entre las `r resumen$n` comunidades y ciudades autónomas analizadas, el porcentaje de diabetes tiene una media de `r round(resumen$media, 2)` % y una mediana de `r round(resumen$mediana, 2)` %, con una desviación típica de `r round(resumen$desv, 2)`. El valor más alto corresponde a `r com_max` (`r round(resumen$maximo, 2)` %) y el más bajo a `r com_min` (`r round(resumen$minimo, 2)` %), lo que da un rango de `r round(resumen$maximo - resumen$minimo, 2)` puntos porcentuales. La mitad central de las comunidades se sitúa entre `r round(resumen$q1, 2)` % y `r round(resumen$q3, 2)` %.
+
+Es importante recalcar que la media no es la media nacional. Es la media simple de las 19 comunidades y no pondera por población.
+
+## Objetivo 2: Luz nocturna por comunidad autónoma
 
 <!-- Paso 10 (Mikel) -->
 Pendiente.
 
-## Objetivo 3: relación entre la luz nocturna y la diabetes
+## Objetivo 3: Relación entre la luz nocturna y la diabetes
 
 <!-- Paso 11 (Diego) -->
 Pendiente.
