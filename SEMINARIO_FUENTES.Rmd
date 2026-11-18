@@ -32,11 +32,13 @@ Sin embargo, la mayoría de estos trabajos se han hecho fuera de España y con d
 
 ## Objetivo general
 
-Pendiente.
+Analizar si la exposición a luz artificial nocturna se relaciona con la prevalencia de diabetes en las comunidades y ciudades autónomas de España en 2023.
 
 ## Objetivos específicos
 
-Pendiente.
+1. Describir la distribución de la prevalencia de diabetes diagnosticada entre las comunidades y ciudades autónomas españolas en 2023.
+2. Describir la distribución de la luz artificial nocturna en esos mismos territorios.
+3. Comparar la prevalencia media de diabetes entre los territorios con luz alta y con luz baja respecto a la mediana.
 
 # Metodología y resultados
 
