@@ -5,7 +5,7 @@ date: "23 de noviembre de 2026"
 output: html_document
 ---
 
-Fuentes de Datos Biomédicos y Web Semántica. 3.º del grado en Ingeniería Biomédica, Universidad de Burgos. Curso 2026-2027.
+Fuentes de Datos Biomédicos y Web Semántica. 3.º del grado de Ingeniería de la Salud, Universidad de Burgos. Curso 2026-2027.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
