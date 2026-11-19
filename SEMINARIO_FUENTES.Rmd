@@ -28,8 +28,6 @@ Sin embargo, la mayoría de estos trabajos se han hecho fuera de España y con d
 
 # Objetivo general y objetivos específicos
 
-<!-- Paso 8 (Diego) -->
-
 ## Objetivo general
 
 Analizar si la exposición a luz artificial nocturna se relaciona con la prevalencia de diabetes en las comunidades y ciudades autónomas de España en 2023.
@@ -87,7 +85,9 @@ com_min <- tabla_diabetes$comunidad[nrow(tabla_diabetes)]
 
 ### Gráfico
 ```{r librerias-graficos}
+
 library(tidyverse)
+library(ggrepel) #instalarlo con: install.packages("ggrepel")
 ```
 
 ```{r grafico-diabetes, fig.height=7, fig.width=8}
@@ -179,6 +179,48 @@ Los territorios más iluminados presentan una prevalencia media de diabetes del 
 Los dos grupos se solapan por completo. En el de luz alta la prevalencia va del 5,08 % de Cataluña al 9,89 % de Melilla, y en el de luz baja del 6,07 % de La Rioja al 9,39 % de Galicia. Hay más variación dentro de cada grupo que entre ellos, de modo que saber si un territorio está muy iluminado no ayuda a predecir su prevalencia de diabetes.
 
 Hay que señalar además que Ceuta y Melilla distorsionan el reparto. Su luz media es de 35,04 y 73,17, muy por encima del tercer valor más alto, que es el de Madrid con 9,84, porque son ciudades pequeñas y casi íntegramente urbanas. Con solo 19 territorios, dos valores tan extremos condicionan por completo el corte por la mediana.
+
+### Gráficos
+
+```{r grafico-cajas, fig.height=5, fig.width=7}
+ggplot(luz_diabetes, aes(x = grupo_luz, y = diabetes_pct)) +
+  geom_boxplot(fill = "lightsteelblue") +
+  geom_jitter(width = 0.08, colour = "steelblue4") +
+  labs(title = "Diabetes según el nivel de luz nocturna",
+       subtitle = "Corte por la mediana de luz (1,70). 19 territorios",
+       x = NULL,
+       y = "Diabetes (%)") +
+  theme_minimal()
+```
+
+Las dos cajas se solapan en casi todo su recorrido. El grupo de luz alta tiene una mediana algo más baja, pero también mucha más dispersión: va del 5,08 % de Cataluña al 9,89 % de Melilla. Es la misma idea que mostraba la tabla, pero aquí se ve que el nivel de luz no separa los territorios en dos grupos distintos.
+
+```{r grafico-relacion, fig.height=5, fig.width=8}
+# Ordenamos por luz y damos a cada territorio su puesto (1 = menos luz)
+puestos <- luz_diabetes %>% 
+  arrange(ntl_mean) %>% 
+  mutate(puesto_luz = row_number())
+
+ggplot(puestos, aes(x = puesto_luz, y = diabetes_pct)) +
+  geom_smooth(method = "lm", se = FALSE, colour = "grey50", linetype = "dashed") +
+  geom_point(aes(colour = grupo_luz), size = 3) +
+  geom_text_repel(aes(label = comunidad), size = 2.7) +
+  scale_colour_manual(values = c("Luz alta" = "darkorange",
+                                 "Luz baja" = "steelblue2")) +
+  labs(title = "Diabetes según el puesto de luz nocturna",
+       subtitle = "Los 19 territorios ordenados de menos (1) a más luz (19)",
+       x = "Puesto de luz nocturna",
+       y = "Diabetes (%)",
+       colour = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+Usamos el puesto de cada territorio en lugar de su valor de luz porque Ceuta y Melilla están tan por encima del resto que, en la escala real, los otros diecisiete puntos se amontonan en el extremo izquierdo. Ordenados por puesto, los diecinueve quedan repartidos y se puede mirar el conjunto.
+
+Los territorios de luz alta aparecen tanto en la parte alta del gráfico (Melilla, Ceuta, Canarias) como en la baja (Cataluña, Madrid, País Vasco), y lo mismo pasa con los de luz baja. La línea discontinua marca la tendencia de los datos y desciende ligeramente, es decir, apunta a menos diabetes donde hay más luz, al revés de lo que cabría esperar.
+
+Esa línea es solo descriptiva, no un modelo estadístico, y no debe leerse como que la luz proteja frente a la diabetes. Las comunidades más iluminadas son también las más urbanas, con población más joven y mayor renta, y son esos factores, que este trabajo no controla, los que explican mejor las diferencias.
 
 # Conclusiones
 
