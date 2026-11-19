@@ -694,14 +694,115 @@ las dos Castillas).</p>
 </div>
 <div id="objetivo-3-relación-entre-la-luz-nocturna-y-la-diabetes" class="section level2">
 <h2>Objetivo 3: Relación entre la luz nocturna y la diabetes</h2>
-<!-- Paso 11 (Diego) -->
-<p>Pendiente.</p>
+<pre class="r"><code>luz_diabetes &lt;- read_csv(&quot;OUTPUT/DATA/luz_diabetes_ccaa_2023.csv&quot;)
+
+# Mediana de la luz nocturna: parte los 19 territorios en dos mitades
+mediana_luz &lt;- median(luz_diabetes$ntl_mean)
+mediana_luz</code></pre>
+<pre><code>## [1] 1.695931</code></pre>
+<pre class="r"><code># Cada territorio a un grupo según quede por encima o por debajo de la mediana
+luz_diabetes &lt;- luz_diabetes %&gt;% 
+  mutate(grupo_luz = case_when(ntl_mean &gt; mediana_luz ~ &quot;Luz alta&quot;,
+                               .default = &quot;Luz baja&quot;))
+
+# Tabla comparativa
+comparacion &lt;- luz_diabetes %&gt;% 
+  group_by(grupo_luz) %&gt;% 
+  summarise(territorios = n(),
+            diabetes_media = round(mean(diabetes_pct), 2),
+            diabetes_min = min(diabetes_pct),
+            diabetes_max = max(diabetes_pct))
+
+comparacion</code></pre>
+<pre><code>## # A tibble: 2 × 5
+##   grupo_luz territorios diabetes_media diabetes_min diabetes_max
+##   &lt;chr&gt;           &lt;int&gt;          &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
+## 1 Luz alta            9           7.53         5.08         9.89
+## 2 Luz baja           10           7.95         6.07         9.39</code></pre>
+<p>La mediana de luz nocturna de los 19 territorios es de 1,70.
+Tomándola como corte, nueve territorios quedan en el grupo de luz alta y
+diez en el de luz baja.</p>
+<p>Los territorios más iluminados presentan una prevalencia media de
+diabetes del 7,53 %, frente al 7,95 % de los menos iluminados. La
+diferencia es de 0,42 puntos porcentuales y va en sentido contrario al
+que cabría esperar si la luz nocturna aumentase el riesgo de
+diabetes.</p>
+<p>Los dos grupos se solapan por completo. En el de luz alta la
+prevalencia va del 5,08 % de Cataluña al 9,89 % de Melilla, y en el de
+luz baja del 6,07 % de La Rioja al 9,39 % de Galicia. Hay más variación
+dentro de cada grupo que entre ellos, de modo que saber si un territorio
+está muy iluminado no ayuda a predecir su prevalencia de diabetes.</p>
+<p>Hay que señalar además que Ceuta y Melilla distorsionan el reparto.
+Su luz media es de 35,04 y 73,17, muy por encima del tercer valor más
+alto, que es el de Madrid con 9,84, porque son ciudades pequeñas y casi
+íntegramente urbanas. Con solo 19 territorios, dos valores tan extremos
+condicionan por completo el corte por la mediana.</p>
 </div>
 </div>
-<div id="conclusiones-generales" class="section level1">
-<h1>Conclusiones generales</h1>
-<!-- Paso 12 (Pablo) -->
-<p>Pendiente.</p>
+<div id="conclusiones" class="section level1">
+<h1>Conclusiones</h1>
+<div id="respuesta-al-objetivo-general" class="section level2">
+<h2>Respuesta al objetivo general</h2>
+<p>El objetivo del trabajo era comprobar si la iluminación artificial
+nocturna se relaciona con la diabetes en las comunidades autónomas de
+España en 2023. Con los datos analizados, <strong>no encontramos
+evidencia de que los territorios con más luz nocturna tengan más
+diabetes</strong>.</p>
+<ul>
+<li><strong>Diabetes (objetivo 1).</strong> La prevalencia va del 5,08 %
+de Cataluña al 9,89 % de Melilla, con una media de 7,75 %.</li>
+<li><strong>Luz nocturna (objetivo 2).</strong> La luz es muy desigual
+entre territorios: de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y
+Melilla son casos extremos (ciudades pequeñas, casi enteramente urbanas)
+y elevan mucho la media, que pasa de 7,94 a 2,5 al quitarlas.</li>
+<li><strong>Relación entre ambas (objetivo 3).</strong> Los territorios
+más iluminados tienen una prevalencia media del 7,53 %, frente al 7,95 %
+de los menos iluminados. La diferencia es de 0,42 puntos y va en sentido
+contrario al esperado. Además, los dos grupos se solapan por completo
+(del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de
+luz baja): hay más variación dentro de cada grupo que entre ellos.</li>
+</ul>
+<p>En conjunto, saber cuánta luz nocturna tiene una comunidad no ayuda a
+predecir su prevalencia de diabetes. Esto no demuestra que la relación
+no exista, solo que este análisis no la detecta.</p>
+</div>
+<div id="limitaciones" class="section level2">
+<h2>Limitaciones</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Pocos datos.</strong> Solo hay 19 territorios (17
+comunidades más Ceuta y Melilla). Con tan pocas observaciones los
+resultados son poco estables y es difícil detectar diferencias pequeñas.
+Dos valores extremos, como Ceuta y Melilla, condicionan el reparto por
+la mediana.</p></li>
+<li><p><strong>Estudio ecológico.</strong> Los datos describen
+territorios enteros, no personas. Una asociación (o la falta de ella)
+entre territorios no permite hablar de causa y efecto ni afirmar nada
+sobre el riesgo individual. Otros factores que varían entre comunidades,
+como la edad de la población, el nivel de renta o el estilo de vida,
+pueden influir en la diabetes y confundir el resultado.</p></li>
+<li><p><strong>La luz del satélite no es la que recibe cada
+persona.</strong> El satélite mide el brillo que sube desde el suelo,
+promediado por píxel y por provincia. No mide la luz que llega a cada
+persona, ni cuánto tiempo está expuesta, ni si duerme con luz en la
+habitación.</p></li>
+<li><p><strong>La diabetes es autodeclarada.</strong> Los datos proceden
+de una encuesta en la que las propias personas dicen si tienen diabetes.
+Puede haber casos sin diagnosticar y diferencias entre comunidades en el
+acceso a la sanidad, así que no equivale a un registro clínico.</p></li>
+</ol>
+<p>Además, el análisis es descriptivo: dividir los territorios por la
+mediana de luz simplifica los datos, y la luz de cada comunidad es la
+media simple de sus provincias, sin ponderar por superficie ni
+población.</p>
+</div>
+<div id="conclusión-final" class="section level2">
+<h2>Conclusión final</h2>
+<p>Con los datos disponibles, la iluminación nocturna no permite
+distinguir las comunidades con más diabetes de las que tienen menos.
+Para estudiar esta cuestión con más garantías haría falta trabajar con
+datos individuales, con más unidades territoriales y tener en cuenta
+factores como la edad y el nivel socioeconómico.</p>
+</div>
 </div>
 <div id="referencias" class="section level1">
 <h1>Referencias</h1>

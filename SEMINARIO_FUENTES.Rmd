@@ -180,10 +180,33 @@ Los dos grupos se solapan por completo. En el de luz alta la prevalencia va del 
 
 Hay que señalar además que Ceuta y Melilla distorsionan el reparto. Su luz media es de 35,04 y 73,17, muy por encima del tercer valor más alto, que es el de Madrid con 9,84, porque son ciudades pequeñas y casi íntegramente urbanas. Con solo 19 territorios, dos valores tan extremos condicionan por completo el corte por la mediana.
 
-# Conclusiones generales
+# Conclusiones
 
-<!-- Paso 12 (Pablo) -->
-Pendiente.
+## Respuesta al objetivo general
+
+El objetivo del trabajo era comprobar si la iluminación artificial nocturna se relaciona con la diabetes en las comunidades autónomas de España en 2023. Con los datos analizados, **no encontramos evidencia de que los territorios con más luz nocturna tengan más diabetes**.
+
+- **Diabetes (objetivo 1).** La prevalencia va del 5,08 % de Cataluña al 9,89 % de Melilla, con una media de `r format(round(mean(luz_diabetes$diabetes_pct), 2), decimal.mark = ",")` %.
+- **Luz nocturna (objetivo 2).** La luz es muy desigual entre territorios: de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y Melilla son casos extremos (ciudades pequeñas, casi enteramente urbanas) y elevan mucho la media, que pasa de 7,94 a 2,5 al quitarlas.
+- **Relación entre ambas (objetivo 3).** Los territorios más iluminados tienen una prevalencia media del 7,53 %, frente al 7,95 % de los menos iluminados. La diferencia es de 0,42 puntos y va en sentido contrario al esperado. Además, los dos grupos se solapan por completo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja): hay más variación dentro de cada grupo que entre ellos.
+
+En conjunto, saber cuánta luz nocturna tiene una comunidad no ayuda a predecir su prevalencia de diabetes. Esto no demuestra que la relación no exista, solo que este análisis no la detecta.
+
+## Limitaciones
+
+1. **Pocos datos.** Solo hay 19 territorios (17 comunidades más Ceuta y Melilla). Con tan pocas observaciones los resultados son poco estables y es difícil detectar diferencias pequeñas. Dos valores extremos, como Ceuta y Melilla, condicionan el reparto por la mediana.
+
+2. **Estudio ecológico.** Los datos describen territorios enteros, no personas. Una asociación (o la falta de ella) entre territorios no permite hablar de causa y efecto ni afirmar nada sobre el riesgo individual. Otros factores que varían entre comunidades, como la edad de la población, el nivel de renta o el estilo de vida, pueden influir en la diabetes y confundir el resultado.
+
+3. **La luz del satélite no es la que recibe cada persona.** El satélite mide el brillo que sube desde el suelo, promediado por píxel y por provincia. No mide la luz que llega a cada persona, ni cuánto tiempo está expuesta, ni si duerme con luz en la habitación.
+
+4. **La diabetes es autodeclarada.** Los datos proceden de una encuesta en la que las propias personas dicen si tienen diabetes. Puede haber casos sin diagnosticar y diferencias entre comunidades en el acceso a la sanidad, así que no equivale a un registro clínico.
+
+Además, el análisis es descriptivo: dividir los territorios por la mediana de luz simplifica los datos, y la luz de cada comunidad es la media simple de sus provincias, sin ponderar por superficie ni población.
+
+## Conclusión final
+
+Con los datos disponibles, la iluminación nocturna no permite distinguir las comunidades con más diabetes de las que tienen menos. Para estudiar esta cuestión con más garantías haría falta trabajar con datos individuales, con más unidades territoriales y tener en cuenta factores como la edad y el nivel socioeconómico.
 
 # Referencias
 
