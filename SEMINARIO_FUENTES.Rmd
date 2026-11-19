@@ -149,8 +149,36 @@ Sin contar Ceuta y Melilla, las comunidades más iluminadas son las que tienen g
 
 ## Objetivo 3: Relación entre la luz nocturna y la diabetes
 
-<!-- Paso 11 (Diego) -->
-Pendiente.
+```{r objetivo3}
+luz_diabetes <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
+
+# Mediana de la luz nocturna: parte los 19 territorios en dos mitades
+mediana_luz <- median(luz_diabetes$ntl_mean)
+mediana_luz
+
+# Cada territorio a un grupo según quede por encima o por debajo de la mediana
+luz_diabetes <- luz_diabetes %>% 
+  mutate(grupo_luz = case_when(ntl_mean > mediana_luz ~ "Luz alta",
+                               .default = "Luz baja"))
+
+# Tabla comparativa
+comparacion <- luz_diabetes %>% 
+  group_by(grupo_luz) %>% 
+  summarise(territorios = n(),
+            diabetes_media = round(mean(diabetes_pct), 2),
+            diabetes_min = min(diabetes_pct),
+            diabetes_max = max(diabetes_pct))
+
+comparacion
+```
+
+La mediana de luz nocturna de los 19 territorios es de 1,70. Tomándola como corte, nueve territorios quedan en el grupo de luz alta y diez en el de luz baja.
+
+Los territorios más iluminados presentan una prevalencia media de diabetes del 7,53 %, frente al 7,95 % de los menos iluminados. La diferencia es de 0,42 puntos porcentuales y va en sentido contrario al que cabría esperar si la luz nocturna aumentase el riesgo de diabetes.
+
+Los dos grupos se solapan por completo. En el de luz alta la prevalencia va del 5,08 % de Cataluña al 9,89 % de Melilla, y en el de luz baja del 6,07 % de La Rioja al 9,39 % de Galicia. Hay más variación dentro de cada grupo que entre ellos, de modo que saber si un territorio está muy iluminado no ayuda a predecir su prevalencia de diabetes.
+
+Hay que señalar además que Ceuta y Melilla distorsionan el reparto. Su luz media es de 35,04 y 73,17, muy por encima del tercer valor más alto, que es el de Madrid con 9,84, porque son ciudades pequeñas y casi íntegramente urbanas. Con solo 19 territorios, dos valores tan extremos condicionan por completo el corte por la mediana.
 
 # Conclusiones generales
 
