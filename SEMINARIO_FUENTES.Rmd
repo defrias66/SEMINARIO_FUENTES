@@ -210,5 +210,14 @@ Con los datos disponibles, la iluminación nocturna no permite distinguir las co
 
 # Referencias
 
-<!-- Paso 13 (Mikel) -->
-Pendiente.
+Banco Mundial. (s. f.). *Space2Stats Monthly & Annual Black Marble Nighttime Lights* (versión 2) [Conjunto de datos]. Recuperado el 19 de noviembre de 2026, de https://datacatalog.worldbank.org/search/dataset/0066940
+
+Instituto Nacional de Estadística. (s. f.). *Problemas o enfermedades crónicas o de larga evolución padecidas en los últimos 12 meses y diagnosticadas por un médico en población adulta según sexo y comunidad autónoma. Población de 15 y más años* (Encuesta de Salud de España 2023, tabla 71554) [Conjunto de datos]. Recuperado el 19 de noviembre de 2026, de https://www.ine.es/jaxi/Tabla.htm?L=0&tpx=71554
+
+Meléndez-Fernández, O. H., Liu, J. A. y Nelson, R. J. (2023). Circadian rhythms disrupted by light at night and mistimed food intake alter hormonal rhythms and metabolism. *International Journal of Molecular Sciences*, *24*(4), 3392. https://doi.org/10.3390/ijms24043392
+
+Touitou, Y., Reinberg, A. y Touitou, D. (2017). Association between light at night, melatonin secretion, sleep deprivation, and the internal clock: Health impacts and mechanisms of circadian disruption. *Life Sciences*, *173*, 94-106. https://doi.org/10.1016/j.lfs.2017.02.008
+
+Xu, Z., Jin, J., Yang, T., Wang, Y., Huang, J., Pan, X., Frank, K. y Li, G. (2023). Outdoor light at night, genetic predisposition and type 2 diabetes mellitus: A prospective cohort study. *Environmental Research*, *219*, 115157. https://doi.org/10.1016/j.envres.2022.115157
+
+Zheng, R., Xin, Z., Li, M., Wang, T., Xu, M., Lu, J., Dai, M., Zhang, D., Chen, Y., Wang, S., Lin, H., Wang, W., Ning, G., Bi, Y., Zhao, Z. y Xu, Y. (2023). Outdoor light at night in relation to glucose homoeostasis and diabetes in Chinese adults: A national and cross-sectional study of 98,658 participants from 162 study sites. *Diabetologia*, *66*(2), 336-345. https://doi.org/10.1007/s00125-022-05819-x
