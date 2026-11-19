@@ -620,8 +620,77 @@ media simple de las 19 comunidades y no pondera por población.</p>
 </div>
 <div id="objetivo-2-luz-nocturna-por-comunidad-autónoma" class="section level2">
 <h2>Objetivo 2: Luz nocturna por comunidad autónoma</h2>
-<!-- Paso 10 (Mikel) -->
-<p>Pendiente.</p>
+<p>Para medir la luz artificial nocturna usamos los datos de satélite
+Black Marble que publica el Banco Mundial. Vienen por provincia, así que
+en el script <code>R/03_luz_por_comunidad.R</code> calculamos para cada
+comunidad la media de sus provincias. Como medida usamos el brillo medio
+por píxel (<code>ntl_mean</code>) y no el brillo total
+(<code>ntl_sum</code>), porque el total depende del tamaño del
+territorio y haría que las comunidades grandes parecieran más
+iluminadas. El resultado está en
+<code>OUTPUT/DATA/luz_ccaa_2023.csv</code>.</p>
+<p>Leemos la tabla, la ordenamos de mayor a menor luz y vemos las cinco
+comunidades con más luz y las cinco con menos:</p>
+<pre class="r"><code>luz &lt;- read_csv(&quot;OUTPUT/DATA/luz_ccaa_2023.csv&quot;)
+
+luz &lt;- luz %&gt;%
+  arrange(desc(luz_media))
+
+slice_head(luz, n = 5)</code></pre>
+<pre><code>## # A tibble: 5 × 3
+##   comunidad            luz_media n_provincias
+##   &lt;chr&gt;                    &lt;dbl&gt;        &lt;dbl&gt;
+## 1 Melilla                  73.2             1
+## 2 Ceuta                    35.0             1
+## 3 Madrid, Comunidad de      9.84            1
+## 4 País Vasco                4.21            3
+## 5 Comunitat Valenciana      4.15            3</code></pre>
+<pre class="r"><code>slice_tail(luz, n = 5)</code></pre>
+<pre><code>## # A tibble: 5 × 3
+##   comunidad               luz_media n_provincias
+##   &lt;chr&gt;                       &lt;dbl&gt;        &lt;dbl&gt;
+## 1 Asturias, Principado de      1.24            1
+## 2 Aragón                       0.62            3
+## 3 Castilla-La Mancha           0.52            5
+## 4 Castilla y León              0.51            9
+## 5 Extremadura                  0.37            2</code></pre>
+<p>Calculamos un resumen de las 19 comunidades. Como Ceuta y Melilla
+tienen valores muy altos, repetimos el resumen sin ellas:</p>
+<pre class="r"><code>luz %&gt;%
+  summarise(comunidades = n(),
+            media = round(mean(luz_media), 2),
+            desviacion = round(sd(luz_media), 2))</code></pre>
+<pre><code>## # A tibble: 1 × 3
+##   comunidades media desviacion
+##         &lt;int&gt; &lt;dbl&gt;      &lt;dbl&gt;
+## 1          19  7.94       17.6</code></pre>
+<pre class="r"><code>luz %&gt;%
+  filter(comunidad != &quot;Ceuta&quot;, comunidad != &quot;Melilla&quot;) %&gt;%
+  summarise(comunidades = n(),
+            media = round(mean(luz_media), 2),
+            desviacion = round(sd(luz_media), 2))</code></pre>
+<pre><code>## # A tibble: 1 × 3
+##   comunidades media desviacion
+##         &lt;int&gt; &lt;dbl&gt;      &lt;dbl&gt;
+## 1          17   2.5        2.3</code></pre>
+<p>Las comunidades con más luz nocturna son Melilla (73,17), Ceuta
+(35,04) y la Comunidad de Madrid (9,84). Las que menos tienen son
+Extremadura (0,37), Castilla y León (0,51) y Castilla-La Mancha (0,52).
+Hay mucha diferencia entre unas y otras: Melilla tiene casi 200 veces
+más luz por píxel que Extremadura, y Madrid, unas 27 veces más que
+Extremadura.</p>
+<p>Ceuta y Melilla salen tan altas porque son ciudades pequeñas casi sin
+campo alrededor, así que casi todos sus píxeles están iluminados. Por
+eso suben mucho la media: con ellas es de 7,94 y la desviación típica de
+17,6, mayor que la propia media; sin ellas, la media baja a 2,5 y la
+desviación a 2,3. Habrá que tenerlo en cuenta en el objetivo 3, porque
+dos valores tan extremos pueden pesar mucho al comparar la luz con la
+diabetes.</p>
+<p>Sin contar Ceuta y Melilla, las comunidades más iluminadas son las
+que tienen grandes ciudades o mucha costa urbanizada (Madrid, País
+Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las
+del interior con mucho territorio rural y poca población (Extremadura y
+las dos Castillas).</p>
 </div>
 <div id="objetivo-3-relación-entre-la-luz-nocturna-y-la-diabetes" class="section level2">
 <h2>Objetivo 3: Relación entre la luz nocturna y la diabetes</h2>
