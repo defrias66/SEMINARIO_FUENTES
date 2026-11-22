@@ -255,7 +255,62 @@ Aunque los valores cambian, el orden de las comunidades casi no cambia: en 2012 
 
 ## Objetivo 3: Renta por comunidad autónoma
 
-Pendiente (mejora 5).
+La renta es uno de los factores que más influyen en la diabetes, así que la incluimos como tercera fuente para ver si explica mejor las diferencias entre territorios que la luz nocturna. Usamos la renta neta media por persona de 2023, el mismo año que las otras dos variables, de la Encuesta de Condiciones de Vida del INE. El script `R/07_datos_renta.R` la descarga y la deja en `OUTPUT/DATA/renta_ccaa_2023.csv`.
+
+```{r renta_leer}
+renta <- read_csv("OUTPUT/DATA/renta_ccaa_2023.csv")
+diabetes_luz <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
+
+renta_diabetes <- left_join(diabetes_luz, renta, by = "comunidad")
+
+# Comprobamos que no se ha quedado ningún territorio sin renta
+sum(is.na(renta_diabetes$renta_euros))
+```
+
+```{r renta_tabla}
+knitr::kable(renta %>% arrange(desc(renta_euros)),
+             col.names = c("Comunidad", "Renta media por persona (€)"),
+             caption = "Renta neta media por persona en 2023, de mayor a menor")
+```
+
+```{r renta_grupos}
+# Separamos por la mediana de renta, igual que hicimos con la luz
+mediana_renta <- median(renta_diabetes$renta_euros)
+mediana_renta
+
+renta_diabetes <- renta_diabetes %>% 
+  mutate(grupo_renta = case_when(renta_euros > mediana_renta ~ "Renta alta",
+                                 .default = "Renta baja"))
+
+renta_diabetes %>% 
+  group_by(grupo_renta) %>% 
+  summarise(territorios = n(),
+            diabetes_media = round(mean(diabetes_pct), 2),
+            diabetes_min = min(diabetes_pct),
+            diabetes_max = max(diabetes_pct))
+```
+
+```{r renta_grafico, fig.height=5, fig.width=8}
+ggplot(renta_diabetes, aes(x = renta_euros, y = diabetes_pct)) +
+  geom_smooth(method = "lm", se = FALSE, colour = "grey50", linetype = "dashed") +
+  geom_point(aes(colour = grupo_renta), size = 3) +
+  geom_text_repel(aes(label = comunidad), size = 2.7) +
+  scale_colour_manual(values = c("Renta alta" = "seagreen",
+                                 "Renta baja" = "indianred")) +
+  labs(title = "Renta media y diabetes por territorio",
+       subtitle = "19 comunidades y ciudades autónomas, 2023",
+       x = "Renta neta media por persona (euros)",
+       y = "Diabetes (%)",
+       colour = NULL) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+La renta va de los 11.314 € de la Región de Murcia a los 18.189 € del País Vasco, con una mediana de 14.124 €. Partiendo los territorios por esa mediana, los de renta alta tienen una prevalencia media de diabetes del 6,64 % y los de renta baja del 8,75 %.
+
+Esa diferencia, de 2,11 puntos porcentuales, es cinco veces mayor que la que encontramos al partir por la luz nocturna, que era de 0,42 puntos. En el gráfico se ve una pendiente clara: los territorios con menos renta tienden a tener más diabetes. Extremadura, la Región de Murcia y Andalucía están entre los de menor renta y mayor prevalencia, mientras que el País Vasco, Madrid y Cataluña ocupan la posición contraria.
+
+Conviene insistir en que esto tampoco demuestra una relación de causa y efecto: la renta va asociada a muchas otras cosas, como la edad de la población, la alimentación o el acceso a la sanidad, y aquí no se separan unas de otras. Lo que sí indica es que, de las dos variables que hemos comparado con la diabetes, la renta discrimina bastante mejor que la luz nocturna.
 
 ## Objetivo 4: Relación entre la luz nocturna y la diabetes
 

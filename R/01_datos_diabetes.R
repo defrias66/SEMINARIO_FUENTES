@@ -1,63 +1,48 @@
 # 01_datos_diabetes.R -----------------------------------------------------
-# Paso 2. Prevalencia de diabetes por comunidad autónoma.
-# Fuente: INE, Encuesta de Salud de España 2023, tabla 71554.
+# Paso 2 (mejora 4). Prevalencia de diabetes por comunidad autónoma.
+# Fuente: INE, Encuesta de Salud de España 2023, tabla 71554,
+#         leída desde la API JSON del INE (servicio Tempus).
 # Salida: OUTPUT/DATA/diabetes_ccaa_2023.csv
 
 library(tidyverse)
+library(jsonlite)
 
-# * Importación desde la web ----------------------------------------------
-# El INE separa las columnas con ";" y escribe los decimales con coma (7,83).
-# Con locale(decimal_mark = ",") le decimos a R que la coma es el decimal;
-# sin eso, lee 7,83 como 783.
-Diabetes_INE <- read_delim("https://www.ine.es/jaxi/files/tpx/es/csv_bdsc/71554.csv",
-                           delim = ";", escape_double = FALSE, trim_ws = TRUE,
-                           locale = locale(decimal_mark = ","))
+# * Importación desde la API del INE --------------------------------------
+# El INE publica cada tabla también en JSON. Devuelve una serie por cada
+# combinación de sexo, territorio, enfermedad y respuesta.
+url_api <- "https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/71554?nult=1"
+
+Diabetes_JSON <- fromJSON(url_api, simplifyVector = TRUE)
+
+class(Diabetes_JSON)
+names(Diabetes_JSON)
+head(Diabetes_JSON$Nombre)
+
+# * De JSON a tabla -------------------------------------------------------
+# "Nombre" describe la serie y "Data" guarda el valor dentro de una lista.
+Diabetes_INE <- tibble(
+  nombre = Diabetes_JSON$Nombre,
+  valor  = sapply(Diabetes_JSON$Data, function(x) x$Valor[1])
+)
 
 Diabetes_INE
-str(Diabetes_INE)
-summary(Diabetes_INE)
-
-# * Nombres de las columnas -----------------------------------------------
-# La tabla trae 5 columnas con nombres largos. Les ponemos nombres cortos,
-# en el mismo orden en que vienen.
-names(Diabetes_INE)
-names(Diabetes_INE) <- c("sexo", "comunidad", "enfermedad", "respuesta", "valor")
-names(Diabetes_INE)
-
-# Categorías de cada columna (para escribir bien los filtros)
-table(Diabetes_INE$sexo)
-table(Diabetes_INE$respuesta)
-levels(factor(Diabetes_INE$comunidad))
 
 # * Filtrado --------------------------------------------------------------
-# Nos quedamos con Diabetes, ambos sexos y respuesta "Sí",
-# y quitamos la fila del total nacional.
+# Las series que buscamos empiezan por "AMBOS SEXOS," y terminan en
+# ", Diabetes, Sí". No separamos el texto por comas porque algunos nombres
+# de comunidad llevan coma dentro ("Asturias, Principado de").
 Diabetes_CCAA <- 
   Diabetes_INE %>% 
-  filter(enfermedad == "Diabetes",
-         sexo == "AMBOS SEXOS",
-         respuesta == "Sí",
-         comunidad != "TOTAL") %>% 
+  filter(str_detect(nombre, "^AMBOS SEXOS, "),
+         str_detect(nombre, ", Diabetes, Sí$")) %>% 
+  mutate(comunidad = str_remove(nombre, "^AMBOS SEXOS, "),
+         comunidad = str_remove(comunidad, ", Diabetes, Sí$")) %>% 
+  filter(comunidad != "TOTAL") %>% 
   select(comunidad, diabetes_pct = valor) %>% 
   arrange(comunidad)
 
-
-# * De texto a número -----------------------------------------------------
-# La columna llega como texto porque la tabla del INE usa ".." en las casillas
-# sin muestra suficiente, y eso obliga a R a leer toda la columna como texto.
-# parse_number() la convierte a número indicando que la coma es el decimal.
-class(Diabetes_CCAA$diabetes_pct)
-
-Diabetes_CCAA <- 
-  Diabetes_CCAA %>% 
-  mutate(diabetes_pct = round(parse_number(diabetes_pct,
-                                           locale = locale(decimal_mark = ",")), 2))
-
-class(Diabetes_CCAA$diabetes_pct)
-
 # * Comprobación ----------------------------------------------------------
-# Tienen que salir 19 filas (17 comunidades + Ceuta + Melilla)
-# y Andalucía con 7.83.
+# 19 filas y Andalucía con 7.83, igual que al leer el CSV.
 Diabetes_CCAA
 summary(Diabetes_CCAA)
 filter(Diabetes_CCAA, comunidad == "Andalucía")
