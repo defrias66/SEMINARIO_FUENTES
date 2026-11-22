@@ -146,7 +146,7 @@ Las comunidades con más luz nocturna son Melilla (73,17), Ceuta (35,04) y la Co
 
 Ceuta y Melilla salen tan altas porque son ciudades pequeñas casi sin campo alrededor, así que casi todos sus píxeles están iluminados. Por eso suben mucho la media: con ellas es de 7,94 y la desviación típica de 17,6, mayor que la propia media; sin ellas, la media baja a 2,5 y la desviación a 2,3. Habrá que tenerlo en cuenta en el objetivo 4, porque dos valores tan extremos pueden pesar mucho al comparar la luz con la diabetes.
 
-Sin contar Ceuta y Melilla, las comunidades más iluminadas son las que tienen grandes ciudades o mucha costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior con mucho territorio rural y poca población (Extremgadura y las dos Castillas).
+Sin contar Ceuta y Melilla, las comunidades más iluminadas son las que tienen grandes ciudades o mucha costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior con mucho territorio rural y poca población (Extremadura y las dos Castillas).
 
 ## Objetivo 3: Renta por comunidad autónoma
 
