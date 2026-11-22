@@ -105,6 +105,58 @@ ggplot(tabla_diabetes,
   theme_minimal()
 ```
 
+### Diabetes por sexo
+
+```{r leer-sexo}
+diabetes_sexo <- read_csv("OUTPUT/DATA/diabetes_ccaa_sexo_2023.csv")
+```
+
+```{r tabla-sexo}
+hombres <- diabetes_sexo %>%
+  filter(sexo == "Hombres") %>%
+  rename(hombres = diabetes_pct) %>%
+  select(comunidad, hombres)
+
+mujeres <- diabetes_sexo %>%
+  filter(sexo == "Mujeres") %>%
+  rename(mujeres = diabetes_pct) %>%
+  select(comunidad, mujeres)
+
+tabla_sexo <- hombres %>%
+  left_join(mujeres, by = "comunidad") %>%
+  mutate(diferencia = round(hombres - mujeres, 2)) %>%
+  arrange(desc(diferencia))
+
+tabla_sexo
+```
+
+```{r grafico-sexo, fig.height=9, fig.width=8}
+ggplot(data = diabetes_sexo,
+       aes(x = fct_reorder(comunidad, diabetes_pct, .fun = mean),
+           y = diabetes_pct, fill = sexo)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(title = "Diabetes por comunidad autónoma y sexo (2023)",
+       x = NULL, y = "Diabetes (%)", fill = "Sexo") +
+  theme_classic()
+```
+
+```{r resumen-sexo}
+medias_sexo <- diabetes_sexo %>%
+  group_by(sexo) %>%
+  summarise(media = mean(diabetes_pct), .groups = "drop")
+
+media_h <- medias_sexo$media[medias_sexo$sexo == "Hombres"]
+media_m <- medias_sexo$media[medias_sexo$sexo == "Mujeres"]
+
+n_h_mayor   <- nrow(filter(tabla_sexo, diferencia > 0))
+com_dif_max <- tabla_sexo$comunidad[1]
+dif_max     <- tabla_sexo$diferencia[1]
+com_dif_min <- tabla_sexo$comunidad[nrow(tabla_sexo)]
+dif_min     <- tabla_sexo$diferencia[nrow(tabla_sexo)]
+```
+
 ### Descripción
 
 Entre las `r resumen$n` comunidades y ciudades autónomas analizadas, el porcentaje de diabetes tiene una media de `r round(resumen$media, 2)` % y una mediana de `r round(resumen$mediana, 2)` %, con una desviación típica de `r round(resumen$desv, 2)`. El valor más alto corresponde a `r com_max` (`r round(resumen$maximo, 2)` %) y el más bajo a `r com_min` (`r round(resumen$minimo, 2)` %), lo que da un rango de `r round(resumen$maximo - resumen$minimo, 2)` puntos porcentuales. La mitad central de las comunidades se sitúa entre `r round(resumen$q1, 2)` % y `r round(resumen$q3, 2)` %.
