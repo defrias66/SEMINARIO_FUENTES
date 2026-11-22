@@ -34,13 +34,14 @@ Analizar si la exposición a luz artificial nocturna se relaciona con la prevale
 
 ## Objetivos específicos
 
-1. Describir la distribución de la prevalencia de diabetes diagnosticada entre las comunidades y ciudades autónomas españolas en 2023.
-2. Describir la distribución de la luz artificial nocturna en esos mismos territorios.
-3. Comparar la prevalencia media de diabetes entre los territorios con luz alta y con luz baja respecto a la mediana.
+1. Describir la prevalencia de diabetes diagnosticada por comunidad y ciudad autónoma y por sexo en 2023.
+2. Describir la distribución de la luz artificial nocturna en esos territorios y su evolución entre 2012 y 2023.
+3. Describir la renta media por persona de cada territorio como posible factor asociado a la diabetes.
+4. Comparar la prevalencia media de diabetes entre los territorios con luz alta y con luz baja respecto a la mediana.
 
 # Metodología y resultados
 
-## Objetivo 1: Diabetes por comunidad autónoma
+## Objetivo 1: Diabetes por comunidad autónoma y por sexo
 
 ### Datos
 
@@ -110,7 +111,7 @@ Entre las `r resumen$n` comunidades y ciudades autónomas analizadas, el porcent
 
 Es importante recalcar que la media no es la media nacional. Es la media simple de las 19 comunidades y no pondera por población.
 
-## Objetivo 2: Luz nocturna por comunidad autónoma
+## Objetivo 2: Luz nocturna por comunidad autónoma y su evolución (2012-2023)
 
 Para medir la luz artificial nocturna usamos los datos de satélite Black Marble que publica el Banco Mundial. Vienen por provincia, así que en el script `R/03_luz_por_comunidad.R` calculamos para cada comunidad la media de sus provincias. Como medida usamos el brillo medio por píxel (`ntl_mean`) y no el brillo total (`ntl_sum`), porque el total depende del tamaño del territorio y haría que las comunidades grandes parecieran más iluminadas. El resultado está en `OUTPUT/DATA/luz_ccaa_2023.csv`.
 
@@ -147,7 +148,11 @@ Ceuta y Melilla salen tan altas porque son ciudades pequeñas casi sin campo alr
 
 Sin contar Ceuta y Melilla, las comunidades más iluminadas son las que tienen grandes ciudades o mucha costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior con mucho territorio rural y poca población (Extremadura y las dos Castillas).
 
-## Objetivo 3: Relación entre la luz nocturna y la diabetes
+## Objetivo 3: Renta por comunidad autónoma
+
+Pendiente (mejora 5).
+
+## Objetivo 4: Relación entre la luz nocturna y la diabetes
 
 ```{r objetivo3}
 luz_diabetes <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
@@ -230,7 +235,7 @@ El objetivo del trabajo era comprobar si la iluminación artificial nocturna se 
 
 - **Diabetes (objetivo 1).** La prevalencia va del 5,08 % de Cataluña al 9,89 % de Melilla, con una media de `r format(round(mean(luz_diabetes$diabetes_pct), 2), decimal.mark = ",")` %.
 - **Luz nocturna (objetivo 2).** La luz es muy desigual entre territorios: de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y Melilla son casos extremos (ciudades pequeñas, casi enteramente urbanas) y elevan mucho la media, que pasa de 7,94 a 2,5 al quitarlas.
-- **Relación entre ambas (objetivo 3).** Los territorios más iluminados tienen una prevalencia media del 7,53 %, frente al 7,95 % de los menos iluminados. La diferencia es de 0,42 puntos y va en sentido contrario al esperado. Además, los dos grupos se solapan por completo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja): hay más variación dentro de cada grupo que entre ellos.
+- **Relación entre ambas (objetivo 4).** Los territorios más iluminados tienen una prevalencia media del 7,53 %, frente al 7,95 % de los menos iluminados. La diferencia es de 0,42 puntos y va en sentido contrario al esperado. Además, los dos grupos se solapan por completo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja): hay más variación dentro de cada grupo que entre ellos.
 
 En conjunto, saber cuánta luz nocturna tiene una comunidad no ayuda a predecir su prevalencia de diabetes. Esto no demuestra que la relación no exista, solo que este análisis no la detecta.
 
