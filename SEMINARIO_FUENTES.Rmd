@@ -12,8 +12,17 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
 ```{r librerias}
+# Paquetes que usa el seminario. Si falta alguno, ejecutar una sola vez
+# en la consola (no hace falta al compilar):
+# install.packages("tidyverse")
+# install.packages("jsonlite")
+# install.packages("ggrepel")
+# install.packages("knitr")
+# install.packages("rmarkdown")
+
 library(readr)
 library(dplyr)
+
 ```
 
 # Introducción
