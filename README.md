@@ -64,10 +64,3 @@ install.packages(c("tidyverse", "ggrepel", "rmarkdown", "knitr"))
 ```
 
 `tidyverse` incluye `readr`, `dplyr`, `ggplot2` y `tidyr`. `ggrepel` se usa para las etiquetas de los gráficos de dispersión.
-
-## Cómo reproducirlo
-
-1. Clona el repositorio y abre `SEMINARIO_FUENTES.Rproj` con RStudio, para que las rutas relativas funcionen.
-2. Instala los paquetes (comando de arriba, una sola vez).
-3. Ejecuta los scripts de la carpeta `R/` **en este orden**: `01`, `01b`, `02`, `03`, `04`, `05`, `07`. Hace falta conexión a internet: `02` y `05` descargan un fichero de unos 220 MB y tardan unos minutos.
-4. Abre `SEMINARIO_FUENTES.Rmd` y pulsa **Knit** para generar `SEMINARIO_FUENTES.html`.
