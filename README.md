@@ -1,12 +1,10 @@
-# RELACIÓN ENTRE ILUMINACIÓN ARTIFICIAL NOCTURNA Y DIABETES POR COMUNIDADES AUTÓNOMAS EN ESPAÑA
-
-S# Iluminación artificial nocturna y diabetes en las comunidades autónomas de España (2023)
+# Iluminación artificial nocturna y diabetes en las comunidades autónomas de España (2023)
 
 Trabajo de la asignatura *Fuentes de Datos Biomédicos y Web Semántica* (3.º del Grado en Ingeniería de la Salud, Universidad de Burgos, curso 2026-2027).
 
 **Autores:** Diego Medel, Pablo de Frías y Mikel Lasa.
 
-📄 **Informe:** [SEMINARIO_FUENTES.html](ENLACE_AL_HTML)
+**Informe:** [SEMINARIO_FUENTES.html](SEMINARIO_FUENTES.html) (descargarlo y abrirlo en el navegador). El código está en [SEMINARIO_FUENTES.Rmd](SEMINARIO_FUENTES.Rmd).
 
 ## Pregunta
 
@@ -20,11 +18,12 @@ En los 19 territorios analizados (17 comunidades más Ceuta y Melilla) **no enco
 
 ## Fuentes de datos
 
-| Dato | Fuente | Cómo se obtiene |
-|---|---|---|
-| Diabetes por comunidad y sexo | INE, Encuesta de Salud de España 2023, tabla 71554 | Se descarga desde la web del INE en los scripts `01` y `01b` |
-| Luz artificial nocturna | Banco Mundial, *Space2Stats Monthly & Annual Black Marble Nighttime Lights* (NASA Black Marble), nivel ADM2 | Se descarga en `02` y `05` (fichero de unos 220 MB) |
-| Renta neta media por persona | INE, Encuesta de Condiciones de Vida, 2023 | Se descarga en `07` |
+| Dato | Fuente | Formato | Cómo se obtiene |
+|---|---|---|---|
+| Diabetes por comunidad | INE, Encuesta de Salud de España 2023, tabla 71554 | JSON (API del INE) | Script `01` |
+| Diabetes por comunidad y sexo | INE, Encuesta de Salud de España 2023, tabla 71554 | CSV | Script `06` |
+| Luz artificial nocturna | Banco Mundial, *Space2Stats Monthly & Annual Black Marble Nighttime Lights* (NASA Black Marble), nivel ADM2 | CSV (unos 230 MB) | Scripts `02` y `05` |
+| Renta neta media por persona | INE, Encuesta de Condiciones de Vida 2023, tabla 9947 (ingresos de 2022) | JSON (API del INE) | Script `07` |
 
 ## Estructura del repositorio
 
@@ -32,11 +31,11 @@ En los 19 territorios analizados (17 comunidades más Ceuta y Melilla) **no enco
 SEMINARIO_FUENTES/
 ├── R/                          Scripts, numerados en orden de ejecución
 │   ├── 01_datos_diabetes.R
-│   ├── 01b_diabetes_sexo.R
 │   ├── 02_datos_luz.R
 │   ├── 03_luz_por_comunidad.R
 │   ├── 04_unir_tablas.R
 │   ├── 05_luz_evolucion.R
+│   ├── 06_diabetes_sexo.R
 │   └── 07_datos_renta.R
 ├── INPUT/DATA/                 Datos descargados (el fichero grande no se sube a GitHub)
 ├── OUTPUT/DATA/                Tablas generadas por los scripts
@@ -49,18 +48,24 @@ SEMINARIO_FUENTES/
 
 | Script | Qué hace | Resultado |
 |---|---|---|
-| `01_datos_diabetes.R` | Prevalencia de diabetes por comunidad (ambos sexos) | `OUTPUT/DATA/diabetes_ccaa_2023.csv` |
-| `01b_diabetes_sexo.R` | Prevalencia de diabetes por comunidad y sexo | `OUTPUT/DATA/diabetes_ccaa_sexo_2023.csv` |
+| `01_datos_diabetes.R` | Lee la diabetes por comunidad (ambos sexos) desde la API JSON del INE | `OUTPUT/DATA/diabetes_ccaa_2023.csv` |
 | `02_datos_luz.R` | Descarga la luz nocturna mundial y se queda con España en 2023 | `INPUT/DATA/luz_ESP_2023.csv` |
 | `03_luz_por_comunidad.R` | Calcula la luz media de cada comunidad a partir de sus provincias | `OUTPUT/DATA/luz_ccaa_2023.csv` |
 | `04_unir_tablas.R` | Une luz y diabetes (19 filas, sin NA) | `OUTPUT/DATA/luz_diabetes_ccaa_2023.csv` |
-| `05_luz_evolucion.R` | Luz media por comunidad entre 2012 y 2023 | `OUTPUT/DATA/luz_ccaa_2012_2023.csv` |
-| `07_datos_renta.R` | Descarga la renta media por persona | `OUTPUT/DATA/renta_ccaa_2023.csv` |
+| `05_luz_evolucion.R` | Luz media por comunidad entre 2012 y 2023 (necesita haber ejecutado `02`) | `OUTPUT/DATA/luz_ccaa_2012_2023.csv` |
+| `06_diabetes_sexo.R` | Descarga la diabetes por comunidad y sexo en CSV | `OUTPUT/DATA/diabetes_ccaa_sexo_2023.csv` |
+| `07_datos_renta.R` | Lee la renta media por persona desde la API JSON del INE | `OUTPUT/DATA/renta_ccaa_2023.csv` |
+
+## Cómo reproducirlo
+
+1. Abrir `SEMINARIO_FUENTES.Rproj` en RStudio, para que las rutas funcionen desde la carpeta del proyecto.
+2. Ejecutar los scripts de `R/` en orden (del `01` al `07`).
+3. Abrir `SEMINARIO_FUENTES.Rmd` y pulsar Knit para generar el HTML.
 
 ## Paquetes necesarios
 
 ```r
-install.packages(c("tidyverse", "ggrepel", "rmarkdown", "knitr"))
+install.packages(c("tidyverse", "jsonlite", "tidyjson", "ggrepel", "rmarkdown"))
 ```
 
-`tidyverse` incluye `readr`, `dplyr`, `ggplot2` y `tidyr`. `ggrepel` se usa para las etiquetas de los gráficos de dispersión.
+`tidyverse` incluye `readr`, `dplyr`, `tidyr` y `ggplot2`. `jsonlite` y `tidyjson` leen los datos del INE en JSON y `ggrepel` coloca las etiquetas de los gráficos sin que se monten.

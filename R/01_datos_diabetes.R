@@ -6,39 +6,61 @@
 
 library(tidyverse)
 library(jsonlite)
+library(tidyjson)
 
 # * Importación desde la API del INE --------------------------------------
 # El INE publica cada tabla también en JSON. Devuelve una serie por cada
 # combinación de sexo, territorio, enfermedad y respuesta.
-url_api <- "https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/71554?nult=1"
+# nult=1 pide solo el último dato y tip=AM añade los metadatos de cada serie.
+url_api <- "https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/71554?nult=1&tip=AM"
 
-Diabetes_JSON <- fromJSON(url_api, simplifyVector = TRUE)
+Diabetes_JSON <- fromJSON(url_api, simplifyVector = FALSE)
 
 class(Diabetes_JSON)
-names(Diabetes_JSON)
-head(Diabetes_JSON$Nombre)
+length(Diabetes_JSON)
 
-# * De JSON a tabla -------------------------------------------------------
-# "Nombre" describe la serie y "Data" guarda el valor dentro de una lista.
-Diabetes_INE <- tibble(
-  nombre = Diabetes_JSON$Nombre,
-  valor  = sapply(Diabetes_JSON$Data, function(x) x$Valor[1])
-)
+# Miramos qué campos son escalares y cuáles son arrays (apartado 5.4.5)
+Diabetes_JSON %>%
+  gather_object() %>%
+  json_types() %>%
+  count(name, type)
+
+# * De JSON a tabla con tidyjson ------------------------------------------
+# Cada serie es un documento (document.id). Tiene dos arrays:
+#  - MetaData: el sexo, la comunidad, la enfermedad y la respuesta
+#  - Data: el valor
+Metadatos <-
+  Diabetes_JSON %>%
+  enter_object(MetaData) %>%
+  gather_array() %>%
+  spread_all() %>%
+  as_tibble() %>%
+  select(document.id, T3_Variable, Nombre) %>%
+  pivot_wider(names_from = T3_Variable, values_from = Nombre)
+
+Valores <-
+  Diabetes_JSON %>%
+  enter_object(Data) %>%
+  gather_array() %>%
+  spread_all() %>%
+  as_tibble() %>%
+  select(document.id, Valor)
+
+Diabetes_INE <- left_join(Metadatos, Valores, by = "document.id")
 
 Diabetes_INE
 
 # * Filtrado --------------------------------------------------------------
-# Las series que buscamos empiezan por "AMBOS SEXOS," y terminan en
-# ", Diabetes, Sí". No separamos el texto por comas porque algunos nombres
-# de comunidad llevan coma dentro ("Asturias, Principado de").
-Diabetes_CCAA <- 
-  Diabetes_INE %>% 
-  filter(str_detect(nombre, "^AMBOS SEXOS, "),
-         str_detect(nombre, ", Diabetes, Sí$")) %>% 
-  mutate(comunidad = str_remove(nombre, "^AMBOS SEXOS, "),
-         comunidad = str_remove(comunidad, ", Diabetes, Sí$")) %>% 
-  filter(comunidad != "TOTAL") %>% 
-  select(comunidad, diabetes_pct = valor) %>% 
+# Ambos sexos, diabetes, respuesta "Sí" y sin el total nacional.
+# Los nombres de las columnas llevan espacios, por eso van entre comillas
+# invertidas.
+Diabetes_CCAA <-
+  Diabetes_INE %>%
+  filter(SEXO == "AMBOS SEXOS",
+         ENFERMEDADES == "Diabetes",
+         `SI O NO` == "Sí",
+         `COMUNIDAD AUTÓNOMA` != "TOTAL") %>%
+  select(comunidad = `COMUNIDAD AUTÓNOMA`, diabetes_pct = Valor) %>%
   arrange(comunidad)
 
 # * Comprobación ----------------------------------------------------------

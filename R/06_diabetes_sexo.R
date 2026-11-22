@@ -1,4 +1,4 @@
-# 01b_diabetes_sexo.R -----------------------------------------------------
+# 06_diabetes_sexo.R ------------------------------------------------------
 # Prevalencia de diabetes por comunidad autónoma y sexo.
 # Fuente: INE, Encuesta de Salud de España 2023, tabla 71554.
 # Salida: OUTPUT/DATA/diabetes_ccaa_sexo_2023.csv
@@ -20,7 +20,7 @@ table(Diabetes_INE$sexo)
 Diabetes_sexo <- 
   Diabetes_INE %>% 
   filter(enfermedad == "Diabetes",
-         sexo %in% c("Hombres", "Mujeres"),
+         sexo == "Hombres" | sexo == "Mujeres",
          respuesta == "Sí",
          comunidad != "TOTAL") %>% 
   select(comunidad, sexo, diabetes_pct = valor) %>% 
@@ -34,10 +34,8 @@ Diabetes_sexo <-
 
 # * Comprobación ----------------------------------------------------------
 Diabetes_sexo
-nrow(Diabetes_sexo)            # 38 (19 comunidades x 2 sexos)
-table(Diabetes_sexo$sexo)      # 19 y 19
+table(Diabetes_sexo$sexo)      # 19 y 19 (38 filas en total)
 summary(Diabetes_sexo)         # mirar si hay NA en diabetes_pct
-filter(Diabetes_sexo, is.na(diabetes_pct))
 
 # * Exportación -----------------------------------------------------------
 write_csv(x = Diabetes_sexo, file = "OUTPUT/DATA/diabetes_ccaa_sexo_2023.csv", col_names = TRUE)

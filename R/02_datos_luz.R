@@ -15,6 +15,6 @@ names(luz_mundo)
 
 luz_esp_2023 <- luz_mundo %>%
   filter(ISO_A3 == "ESP", year == 2023)
-sort(unique(luz_esp_2023$NAM_1))
+levels(factor(luz_esp_2023$NAM_1))
 
 write_csv(x = luz_esp_2023, file = "INPUT/DATA/luz_ESP_2023.csv", col_names = TRUE)

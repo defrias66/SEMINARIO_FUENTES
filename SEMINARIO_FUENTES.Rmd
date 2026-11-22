@@ -16,13 +16,12 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 # en la consola (no hace falta al compilar):
 # install.packages("tidyverse")
 # install.packages("jsonlite")
+# install.packages("tidyjson")
 # install.packages("ggrepel")
-# install.packages("knitr")
 # install.packages("rmarkdown")
 
-library(readr)
-library(dplyr)
-
+library(tidyverse)
+library(ggrepel)
 ```
 
 # Introducción
@@ -33,7 +32,7 @@ El motivo es el reloj biológico. Nuestro cuerpo sigue un ritmo de unas 24 horas
 
 Varios estudios han medido la luz nocturna exterior con imágenes de satélite y la han comparado con la diabetes. En China, un estudio con 98.658 adultos de 162 zonas encontró que en las zonas con más luz nocturna la diabetes era un 28 % más frecuente que en las zonas con menos luz (Zheng et al., 2023). Otro estudio, que siguió a 283.374 personas durante varios años, observó que quienes vivían en las zonas más iluminadas tenían más riesgo de desarrollar diabetes tipo 2 (Xu et al., 2023).
 
-Sin embargo, la mayoría de estos trabajos se han hecho fuera de España y con datos de cada persona. No hemos encontrado ningún estudio que compare la luz nocturna y la diabetes entre las comunidades autónomas españolas con datos públicos recientes. Por eso, en este seminario nos preguntamos si las comunidades con más luz artificial nocturna en 2023 son también las que tienen un mayor porcentaje de personas con diabetes. Para responderlo usamos dos fuentes abiertas: la Encuesta de Salud de España 2023 del INE, para la diabetes, y los datos de luz nocturna por satélite (Black Marble) que publica el Banco Mundial.
+Sin embargo, la mayoría de estos trabajos se han hecho fuera de España y con datos de cada persona. No hemos encontrado ningún estudio que compare la luz nocturna y la diabetes entre las comunidades autónomas españolas con datos públicos recientes. Por eso, en este seminario nos preguntamos si las comunidades con más luz artificial nocturna en 2023 son también las que tienen un mayor porcentaje de personas con diabetes. Para responderlo usamos tres fuentes abiertas: la Encuesta de Salud de España 2023 del INE, para la diabetes; los datos de luz nocturna por satélite (Black Marble) que publica el Banco Mundial, y la Encuesta de Condiciones de Vida del INE, para la renta.
 
 # Objetivo general y objetivos específicos
 
@@ -54,6 +53,8 @@ Analizar si la exposición a luz artificial nocturna se relaciona con la prevale
 
 ### Datos
 
+Los datos de diabetes son de la Encuesta de Salud de España 2023 del INE (tabla 71554). El script `R/01_datos_diabetes.R` los lee en formato JSON desde la API del INE y el script `R/04_unir_tablas.R` los une con la luz nocturna en `OUTPUT/DATA/luz_diabetes_ccaa_2023.csv`, que es la tabla que leemos aquí. Los datos por sexo salen de la misma tabla del INE con el script `R/06_diabetes_sexo.R`.
+
 ```{r leer-diabetes}
 datos <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
 ```
@@ -63,54 +64,43 @@ datos <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
 ```{r tabla-diabetes}
 tabla_diabetes <- datos %>%
   select(comunidad, diabetes_pct) %>%
-  arrange(desc(diabetes_pct)) %>%
-  mutate(puesto = row_number()) %>%
-  select(puesto, comunidad, diabetes_pct)
+  arrange(desc(diabetes_pct))
 
-knitr::kable(tabla_diabetes,
-             col.names = c("Puesto", "Comunidad", "Diabetes (%)"),
-             caption = "Comunidades ordenadas de mayor a menor porcentaje de diabetes (2023)")
+tabla_diabetes
 ```
 
 ### Resumen numérico
 
 ```{r resumen-diabetes}
 resumen <- datos %>%
-  summarise(n       = n(),
-            media   = mean(diabetes_pct),
-            mediana = median(diabetes_pct),
-            desv    = sd(diabetes_pct),
-            minimo  = min(diabetes_pct),
-            q1      = quantile(diabetes_pct, 0.25),
-            q3      = quantile(diabetes_pct, 0.75),
-            maximo  = max(diabetes_pct))
+  summarise(n     = n(),
+            media = round(mean(diabetes_pct), 2),
+            desv  = round(sd(diabetes_pct), 2))
 
-knitr::kable(resumen, digits = 2,
-             caption = "Resumen estadístico del porcentaje de diabetes por comunidad")
+resumen
 
-# Para el texto
-com_max <- tabla_diabetes$comunidad[1]
-com_min <- tabla_diabetes$comunidad[nrow(tabla_diabetes)]
+# Comunidad con más diabetes y con menos
+slice_max(tabla_diabetes, order_by = diabetes_pct, n = 1)
+slice_min(tabla_diabetes, order_by = diabetes_pct, n = 1)
 ```
 
 ### Gráfico
-```{r librerias-graficos}
 
-library(tidyverse)
-library(ggrepel) #instalarlo con: install.packages("ggrepel")
-```
+Para que el gráfico salga ordenado convertimos la comunidad en un factor (`factor()`) con los niveles en el orden de la diabetes, de menor a mayor.
 
-```{r grafico-diabetes, fig.height=7, fig.width=8}
-ggplot(tabla_diabetes,
-       aes(x = reorder(comunidad, diabetes_pct), y = diabetes_pct)) +
-  geom_col(fill = "steelblue") +
-  geom_hline(yintercept = mean(tabla_diabetes$diabetes_pct),
-             linetype = "dashed", colour = "red") +
-  coord_flip() +
+```{r grafico-diabetes, fig.height=7, fig.width=8, fig.cap="Porcentaje de diabetes por comunidad autónoma en 2023, de mayor a menor."}
+orden_diabetes <- arrange(datos, diabetes_pct)
+
+datos_grafico <- datos %>%
+  mutate(comunidad = factor(comunidad, levels = orden_diabetes$comunidad))
+
+ggplot(datos_grafico, aes(x = diabetes_pct, y = comunidad)) +
+  geom_point(colour = "steelblue", size = 3) +
+  geom_text_repel(aes(label = diabetes_pct), size = 3) +
   labs(title = "Diabetes por comunidad autónoma (2023)",
-       subtitle = "La línea roja marca la media de las 19 comunidades",
-       x = NULL,
-       y = "Diabetes (%)") +
+       subtitle = "La media de las 19 comunidades es 7,75 %",
+       x = "Diabetes (%)",
+       y = NULL) +
   theme_minimal()
 ```
 
@@ -139,38 +129,34 @@ tabla_sexo <- hombres %>%
 tabla_sexo
 ```
 
-```{r grafico-sexo, fig.height=9, fig.width=8}
-ggplot(data = diabetes_sexo,
-       aes(x = fct_reorder(comunidad, diabetes_pct, .fun = mean),
-           y = diabetes_pct, fill = sexo)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  scale_fill_brewer(palette = "Dark2") +
+```{r grafico-sexo, fig.height=8, fig.width=8, fig.cap="Porcentaje de diabetes en hombres y en mujeres por comunidad autónoma en 2023."}
+# Mismo orden que el gráfico anterior (diabetes de ambos sexos)
+sexo_grafico <- diabetes_sexo %>%
+  mutate(comunidad = factor(comunidad, levels = orden_diabetes$comunidad))
+
+ggplot(sexo_grafico, aes(x = diabetes_pct, y = comunidad, colour = sexo)) +
+  geom_point(size = 3) +
   labs(title = "Diabetes por comunidad autónoma y sexo (2023)",
-       x = NULL, y = "Diabetes (%)", fill = "Sexo") +
-  theme_classic()
+       x = "Diabetes (%)", y = NULL, colour = "Sexo") +
+  theme_minimal()
 ```
 
 ```{r resumen-sexo}
-medias_sexo <- diabetes_sexo %>%
+diabetes_sexo %>%
   group_by(sexo) %>%
-  summarise(media = mean(diabetes_pct), .groups = "drop")
+  summarise(media = round(mean(diabetes_pct), 2))
 
-media_h <- medias_sexo$media[medias_sexo$sexo == "Hombres"]
-media_m <- medias_sexo$media[medias_sexo$sexo == "Mujeres"]
-
-n_h_mayor   <- nrow(filter(tabla_sexo, diferencia > 0))
-com_dif_max <- tabla_sexo$comunidad[1]
-dif_max     <- tabla_sexo$diferencia[1]
-com_dif_min <- tabla_sexo$comunidad[nrow(tabla_sexo)]
-dif_min     <- tabla_sexo$diferencia[nrow(tabla_sexo)]
+# Territorios donde la diabetes es mayor en hombres
+count(filter(tabla_sexo, diferencia > 0))
 ```
 
 ### Descripción
 
-Entre las `r resumen$n` comunidades y ciudades autónomas analizadas, el porcentaje de diabetes tiene una media de `r round(resumen$media, 2)` % y una mediana de `r round(resumen$mediana, 2)` %, con una desviación típica de `r round(resumen$desv, 2)`. El valor más alto corresponde a `r com_max` (`r round(resumen$maximo, 2)` %) y el más bajo a `r com_min` (`r round(resumen$minimo, 2)` %), lo que da un rango de `r round(resumen$maximo - resumen$minimo, 2)` puntos porcentuales. La mitad central de las comunidades se sitúa entre `r round(resumen$q1, 2)` % y `r round(resumen$q3, 2)` %.
+Entre las 19 comunidades y ciudades autónomas analizadas, el porcentaje de diabetes tiene una media de 7,75 %, con una desviación típica de 1,51. El valor más alto corresponde a Melilla (9,89 %) y el más bajo a Cataluña (5,08 %), lo que da un rango de 4,81 puntos porcentuales.
 
 Es importante recalcar que la media no es la media nacional. Es la media simple de las 19 comunidades y no pondera por población.
+
+Por sexo, la prevalencia media es del 7,97 % en los hombres y del 7,54 % en las mujeres. En 13 de los 19 territorios la diabetes es más frecuente en los hombres. La mayor diferencia a favor de los hombres está en la Región de Murcia (4,39 puntos) y la mayor a favor de las mujeres en Ceuta (8,39 puntos). Este último es un valor extremo en una ciudad pequeña, donde la muestra de la encuesta es reducida, por lo que conviene no darle demasiado peso.
 
 ## Objetivo 2: Luz nocturna por comunidad autónoma y su evolución (2012-2023)
 
@@ -211,16 +197,19 @@ Sin contar Ceuta y Melilla, las comunidades más iluminadas son las que tienen g
 
 ### Luz nocturna en 2023
 
-```{r luz_grafico_2023, fig.height=6, fig.width=8}
-ggplot(luz, aes(x = reorder(comunidad, luz_media), y = luz_media)) +
-  geom_col(fill = "darkorange") +
-  geom_text(aes(label = luz_media), hjust = -0.2, size = 3) +
-  expand_limits(y = 80) +
-  coord_flip() +
+```{r luz_grafico_2023, fig.height=6, fig.width=8, fig.cap="Luz artificial nocturna por comunidad autónoma en 2023 (brillo medio por píxel)."}
+orden_luz <- arrange(luz, luz_media)
+
+luz_grafico <- luz %>%
+  mutate(comunidad = factor(comunidad, levels = orden_luz$comunidad))
+
+ggplot(luz_grafico, aes(x = luz_media, y = comunidad)) +
+  geom_point(colour = "darkorange", size = 3) +
+  geom_text_repel(aes(label = luz_media), size = 3) +
   labs(title = "Luz artificial nocturna por comunidad autónoma (2023)",
        subtitle = "Brillo medio por píxel (media de las provincias)",
-       x = NULL,
-       y = "Luz nocturna") +
+       x = "Luz nocturna",
+       y = NULL) +
   theme_minimal()
 ```
 
@@ -241,15 +230,13 @@ cambio_luz <- luz_evolucion %>%
   mutate(cambio_pct = round((`2023` - `2012`) / `2012` * 100, 1)) %>%
   arrange(desc(cambio_pct))
 
-knitr::kable(cambio_luz,
-             col.names = c("Comunidad", "Luz 2012", "Luz 2023", "Cambio (%)"),
-             caption = "Luz nocturna en 2012 y en 2023 y cambio entre los dos años")
+cambio_luz
 ```
 
-```{r luz_evolucion_grafico, fig.height=9, fig.width=9}
+```{r luz_evolucion_grafico, fig.height=9, fig.width=9, fig.cap="Luz nocturna de cada comunidad autónoma entre 2012 y 2023, con su tendencia."}
 ggplot(luz_evolucion, aes(x = anio, y = luz_media)) +
   geom_point(colour = "darkorange", size = 1.5) +
-  geom_smooth(method = "lm", se = FALSE, colour = "grey40", linewidth = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, colour = "grey40") +
   facet_wrap(~ comunidad, ncol = 4, scales = "free_y") +
   labs(title = "Evolución de la luz nocturna por comunidad autónoma (2012-2023)",
        subtitle = "Cada panel tiene su propia escala vertical. La línea gris marca la tendencia",
@@ -264,7 +251,7 @@ Aunque los valores cambian, el orden de las comunidades casi no cambia: en 2012 
 
 ## Objetivo 3: Renta por comunidad autónoma
 
-La renta es uno de los factores que más influyen en la diabetes, así que la incluimos como tercera fuente para ver si explica mejor las diferencias entre territorios que la luz nocturna. Usamos la renta neta media por persona de 2023, el mismo año que las otras dos variables, de la Encuesta de Condiciones de Vida del INE. El script `R/07_datos_renta.R` la descarga y la deja en `OUTPUT/DATA/renta_ccaa_2023.csv`.
+Para ver si otra variable separa mejor a los territorios que la luz nocturna, añadimos la renta como tercera fuente. Usamos la renta neta media por persona de la Encuesta de Condiciones de Vida del INE (tabla 9947) de 2023, el mismo año de encuesta que las otras dos variables. En esta encuesta la renta es la del año anterior a la entrevista, así que la de 2023 corresponde a los ingresos de 2022. El script `R/07_datos_renta.R` la lee en formato JSON desde la API del INE y la deja en `OUTPUT/DATA/renta_ccaa_2023.csv`.
 
 ```{r renta_leer}
 renta <- read_csv("OUTPUT/DATA/renta_ccaa_2023.csv")
@@ -273,80 +260,90 @@ diabetes_luz <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
 renta_diabetes <- left_join(diabetes_luz, renta, by = "comunidad")
 
 # Comprobamos que no se ha quedado ningún territorio sin renta
-sum(is.na(renta_diabetes$renta_euros))
+# (summary() avisaría con NA's)
+summary(renta_diabetes$renta_euros)
 ```
 
 ```{r renta_tabla}
-knitr::kable(renta %>% arrange(desc(renta_euros)),
-             col.names = c("Comunidad", "Renta media por persona (€)"),
-             caption = "Renta neta media por persona en 2023, de mayor a menor")
+renta %>%
+  arrange(desc(renta_euros))
 ```
 
 ```{r renta_grupos}
-# Separamos por la mediana de renta, igual que hicimos con la luz
-mediana_renta <- median(renta_diabetes$renta_euros)
-mediana_renta
+# Mediana de la renta: con 19 territorios ordenados, es el valor que
+# ocupa el puesto 10
+mediana_renta <- renta_diabetes %>%
+  arrange(renta_euros) %>%
+  slice(10)
 
-renta_diabetes <- renta_diabetes %>% 
-  mutate(grupo_renta = case_when(renta_euros > mediana_renta ~ "Renta alta",
+mediana_renta$renta_euros
+
+renta_diabetes <- renta_diabetes %>%
+  mutate(grupo_renta = case_when(renta_euros > mediana_renta$renta_euros ~ "Renta alta",
                                  .default = "Renta baja"))
 
-renta_diabetes %>% 
-  group_by(grupo_renta) %>% 
+renta_diabetes %>%
+  group_by(grupo_renta) %>%
   summarise(territorios = n(),
-            diabetes_media = round(mean(diabetes_pct), 2),
-            diabetes_min = min(diabetes_pct),
-            diabetes_max = max(diabetes_pct))
+            diabetes_media = round(mean(diabetes_pct), 2))
 ```
 
-```{r renta_grafico, fig.height=5, fig.width=8}
+```{r renta_grafico, fig.height=5, fig.width=8, fig.cap="Renta media por persona frente al porcentaje de diabetes en cada territorio en 2023."}
 ggplot(renta_diabetes, aes(x = renta_euros, y = diabetes_pct)) +
   geom_smooth(method = "lm", se = FALSE, colour = "grey50", linetype = "dashed") +
   geom_point(aes(colour = grupo_renta), size = 3) +
   geom_text_repel(aes(label = comunidad), size = 2.7) +
-  scale_colour_manual(values = c("Renta alta" = "seagreen",
-                                 "Renta baja" = "indianred")) +
   labs(title = "Renta media y diabetes por territorio",
-       subtitle = "19 comunidades y ciudades autónomas, 2023",
+       subtitle = "19 comunidades y ciudades autónomas, encuesta de 2023",
        x = "Renta neta media por persona (euros)",
        y = "Diabetes (%)",
        colour = NULL) +
-  theme_minimal() +
-  theme(legend.position = "top")
+  theme_minimal()
 ```
 
-La renta va de los 11.314 € de la Región de Murcia a los 18.189 € del País Vasco, con una mediana de 14.124 €. Partiendo los territorios por esa mediana, los de renta alta tienen una prevalencia media de diabetes del 6,64 % y los de renta baja del 8,75 %.
+La renta va de los 11.314 € de la Región de Murcia a los 18.189 € del País Vasco, con una mediana de 14.124 € (Castilla y León). Partiendo los territorios por esa mediana, los de renta alta tienen una prevalencia media de diabetes del 6,64 % y los de renta baja del 8,75 %.
 
 Esa diferencia, de 2,11 puntos porcentuales, es cinco veces mayor que la que encontramos al partir por la luz nocturna, que era de 0,42 puntos. En el gráfico se ve una pendiente clara: los territorios con menos renta tienden a tener más diabetes. Extremadura, la Región de Murcia y Andalucía están entre los de menor renta y mayor prevalencia, mientras que el País Vasco, Madrid y Cataluña ocupan la posición contraria.
 
-Conviene insistir en que esto tampoco demuestra una relación de causa y efecto: la renta va asociada a muchas otras cosas, como la edad de la población, la alimentación o el acceso a la sanidad, y aquí no se separan unas de otras. Lo que sí indica es que, de las dos variables que hemos comparado con la diabetes, la renta discrimina bastante mejor que la luz nocturna.
+Conviene insistir en que esto tampoco demuestra una relación de causa y efecto: la renta va asociada a muchas otras cosas, como la edad de la población, la alimentación o el acceso a la sanidad, y aquí no se separan unas de otras. Lo que sí indica es que, de las dos variables que hemos comparado con la diabetes, la renta separa a los territorios bastante mejor que la luz nocturna.
 
 ## Objetivo 4: Relación entre la luz nocturna y la diabetes
 
-```{r objetivo3}
+```{r objetivo4}
 luz_diabetes <- read_csv("OUTPUT/DATA/luz_diabetes_ccaa_2023.csv")
 
-# Mediana de la luz nocturna: parte los 19 territorios en dos mitades
-mediana_luz <- median(luz_diabetes$ntl_mean)
-mediana_luz
+# Mediana de la luz nocturna: con 19 territorios ordenados de menos a más
+# luz, es el valor que ocupa el puesto 10
+mediana_luz <- luz_diabetes %>%
+  arrange(ntl_mean) %>%
+  slice(10)
+
+mediana_luz$ntl_mean
 
 # Cada territorio a un grupo según quede por encima o por debajo de la mediana
-luz_diabetes <- luz_diabetes %>% 
-  mutate(grupo_luz = case_when(ntl_mean > mediana_luz ~ "Luz alta",
+luz_diabetes <- luz_diabetes %>%
+  mutate(grupo_luz = case_when(ntl_mean > mediana_luz$ntl_mean ~ "Luz alta",
                                .default = "Luz baja"))
 
 # Tabla comparativa
-comparacion <- luz_diabetes %>% 
-  group_by(grupo_luz) %>% 
+luz_diabetes %>%
+  group_by(grupo_luz) %>%
   summarise(territorios = n(),
-            diabetes_media = round(mean(diabetes_pct), 2),
-            diabetes_min = min(diabetes_pct),
-            diabetes_max = max(diabetes_pct))
+            diabetes_media = round(mean(diabetes_pct), 2))
 
-comparacion
+# Territorio con menos y con más diabetes de cada grupo
+luz_diabetes %>%
+  group_by(grupo_luz) %>%
+  slice_min(order_by = diabetes_pct, n = 1) %>%
+  select(grupo_luz, comunidad, diabetes_pct)
+
+luz_diabetes %>%
+  group_by(grupo_luz) %>%
+  slice_max(order_by = diabetes_pct, n = 1) %>%
+  select(grupo_luz, comunidad, diabetes_pct)
 ```
 
-La mediana de luz nocturna de los 19 territorios es de 1,70. Tomándola como corte, nueve territorios quedan en el grupo de luz alta y diez en el de luz baja.
+La mediana de luz nocturna de los 19 territorios es de 1,70 (Andalucía). Tomándola como corte, nueve territorios quedan en el grupo de luz alta y diez en el de luz baja.
 
 Los territorios más iluminados presentan una prevalencia media de diabetes del 7,53 %, frente al 7,95 % de los menos iluminados. La diferencia es de 0,42 puntos porcentuales y va en sentido contrario al que cabría esperar si la luz nocturna aumentase el riesgo de diabetes.
 
@@ -356,10 +353,10 @@ Hay que señalar además que Ceuta y Melilla distorsionan el reparto. Su luz med
 
 ### Gráficos
 
-```{r grafico-cajas, fig.height=5, fig.width=7}
+```{r grafico-grupos, fig.height=5, fig.width=7, fig.cap="Porcentaje de diabetes de cada territorio en los grupos de luz alta y de luz baja."}
 ggplot(luz_diabetes, aes(x = grupo_luz, y = diabetes_pct)) +
-  geom_boxplot(fill = "lightsteelblue") +
-  geom_jitter(width = 0.08, colour = "steelblue4") +
+  geom_point(colour = "steelblue4", size = 3) +
+  geom_text_repel(aes(label = comunidad), size = 2.7) +
   labs(title = "Diabetes según el nivel de luz nocturna",
        subtitle = "Corte por la mediana de luz (1,70). 19 territorios",
        x = NULL,
@@ -367,48 +364,61 @@ ggplot(luz_diabetes, aes(x = grupo_luz, y = diabetes_pct)) +
   theme_minimal()
 ```
 
-Las dos cajas se solapan en casi todo su recorrido. El grupo de luz alta tiene una mediana algo más baja, pero también mucha más dispersión: va del 5,08 % de Cataluña al 9,89 % de Melilla. Es la misma idea que mostraba la tabla, pero aquí se ve que el nivel de luz no separa los territorios en dos grupos distintos.
+Los puntos de los dos grupos ocupan casi la misma franja. El grupo de luz alta tiene más dispersión: va del 5,08 % de Cataluña al 9,89 % de Melilla. Es la misma idea que mostraba la tabla, pero aquí se ve que el nivel de luz no separa los territorios en dos grupos distintos.
 
-```{r grafico-relacion, fig.height=5, fig.width=8}
-# Ordenamos por luz y damos a cada territorio su puesto (1 = menos luz)
-puestos <- luz_diabetes %>% 
-  arrange(ntl_mean) %>% 
-  mutate(puesto_luz = row_number())
+```{r grafico-relacion, fig.height=5, fig.width=8, fig.cap="Luz nocturna frente al porcentaje de diabetes en las 17 comunidades, sin Ceuta ni Melilla."}
+# Sin Ceuta ni Melilla, porque su luz es tan alta que amontonaría a las
+# demás comunidades en el extremo izquierdo del gráfico
+luz_diabetes_17 <- luz_diabetes %>%
+  filter(comunidad != "Ceuta", comunidad != "Melilla")
 
-ggplot(puestos, aes(x = puesto_luz, y = diabetes_pct)) +
+ggplot(luz_diabetes_17, aes(x = ntl_mean, y = diabetes_pct)) +
   geom_smooth(method = "lm", se = FALSE, colour = "grey50", linetype = "dashed") +
   geom_point(aes(colour = grupo_luz), size = 3) +
   geom_text_repel(aes(label = comunidad), size = 2.7) +
-  scale_colour_manual(values = c("Luz alta" = "darkorange",
-                                 "Luz baja" = "steelblue2")) +
-  labs(title = "Diabetes según el puesto de luz nocturna",
-       subtitle = "Los 19 territorios ordenados de menos (1) a más luz (19)",
-       x = "Puesto de luz nocturna",
+  labs(title = "Luz nocturna y diabetes por comunidad autónoma",
+       subtitle = "17 comunidades (sin Ceuta ni Melilla), 2023",
+       x = "Luz nocturna (brillo medio por píxel)",
        y = "Diabetes (%)",
        colour = NULL) +
-  theme_minimal() +
-  theme(legend.position = "top")
+  theme_minimal()
 ```
 
-Usamos el puesto de cada territorio en lugar de su valor de luz porque Ceuta y Melilla están tan por encima del resto que, en la escala real, los otros diecisiete puntos se amontonan en el extremo izquierdo. Ordenados por puesto, los diecinueve quedan repartidos y se puede mirar el conjunto.
+Quitamos Ceuta y Melilla de este gráfico porque su luz es tan alta que, en la escala real, las otras diecisiete comunidades se amontonan en el extremo izquierdo.
 
-Los territorios de luz alta aparecen tanto en la parte alta del gráfico (Melilla, Ceuta, Canarias) como en la baja (Cataluña, Madrid, País Vasco), y lo mismo pasa con los de luz baja. La línea discontinua marca la tendencia de los datos y desciende ligeramente, es decir, apunta a menos diabetes donde hay más luz, al revés de lo que cabría esperar.
+Las comunidades de luz alta aparecen tanto en la parte alta del gráfico (Canarias, Región de Murcia) como en la baja (Cataluña, Madrid, País Vasco), y lo mismo pasa con las de luz baja (Galicia y Extremadura arriba, La Rioja abajo). La línea discontinua marca la tendencia de los datos y desciende, es decir, apunta a menos diabetes donde hay más luz, al revés de lo que cabría esperar. Esa bajada depende mucho de Madrid, que tiene mucha más luz que el resto y poca diabetes.
 
-Esa línea es solo descriptiva, no un modelo estadístico, y no debe leerse como que la luz proteja frente a la diabetes. Las comunidades más iluminadas son también las más urbanas, con población más joven y mayor renta, y son esos factores, que este trabajo no controla, los que explican mejor las diferencias.
+Esa línea es solo una ayuda para ver la tendencia y no debe leerse como que la luz proteja frente a la diabetes. Los territorios de luz alta tienen algo más de renta que los de luz baja (14.283 € de media frente a 13.745 €), y en el objetivo 3 hemos visto que la renta separa mucho mejor a los territorios según su diabetes. Otros factores que este trabajo no controla, como la edad de la población, también pueden influir.
+
+```{r renta_por_luz}
+# Renta media de los grupos de luz alta y luz baja
+luz_diabetes %>%
+  left_join(renta, by = "comunidad") %>%
+  group_by(grupo_luz) %>%
+  summarise(renta_media = round(mean(renta_euros)))
+```
 
 # Conclusiones
 
 ## Respuesta al objetivo general
 
-El objetivo era comprobar si la exposición a luz artificial nocturna se relaciona con la prevalencia de diabetes en las comunidades y ciudades autónomas de España en 2023. Con los datos analizados, **no encontramos evidencia de que los territorios con más luz nocturna tengan más diabetes**. Los más iluminados tienen una prevalencia media algo menor (7,53 %) que los menos iluminados (7,95 %), y los dos grupos se solapan por completo. Esto no demuestra que la relación no exista, solo que este análisis no la detecta. Además, la renta separa a los territorios mucho mejor que la luz.
+El objetivo era comprobar si la exposición a luz artificial nocturna se relaciona con la prevalencia de diabetes en las comunidades y ciudades autónomas de España en 2023. Con los datos analizados, no encontramos evidencia de que los territorios con más luz nocturna tengan más diabetes. Los más iluminados tienen una prevalencia media algo menor (7,53 %) que los menos iluminados (7,95 %), y los dos grupos se solapan por completo. Esto no demuestra que la relación no exista, solo que este análisis no la detecta. Además, la renta separa a los territorios mucho mejor que la luz.
 
-**Objetivo 1: diabetes por comunidad y sexo.** La prevalencia de diabetes diagnosticada va del 5,08 % de Cataluña al 9,89 % de Melilla, con una media de 7,75 % y una mediana de 7,83 %. Por sexo, la prevalencia media es del `r format(round(media_h, 2), decimal.mark = ",")` % en los hombres y del `r format(round(media_m, 2), decimal.mark = ",")` % en las mujeres. En `r n_h_mayor` de los 19 territorios la prevalencia es mayor en hombres. La mayor diferencia a favor de los hombres se da en `r com_dif_max` (`r format(dif_max, decimal.mark = ",")` puntos porcentuales) y la mayor a favor de las mujeres en `r com_dif_min` (`r format(abs(dif_min), decimal.mark = ",")` puntos). Este último es un valor extremo en una ciudad pequeña, donde la muestra de la encuesta es reducida, por lo que conviene no darle demasiado peso.
+### Objetivo 1: diabetes por comunidad y sexo
 
-**Objetivo 2: distribución y evolución de la luz nocturna.** La luz es muy desigual: va de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y Melilla son casos extremos (ciudades pequeñas casi sin campo alrededor) y elevan la media del conjunto de 2,5 a 7,94. Las comunidades más iluminadas, sin contar esas dos, son las de grandes ciudades o costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior rural (Extremadura y las dos Castillas). Entre 2012 y 2023 la luz ha bajado en 15 de los 19 territorios, sobre todo en Ceuta (-37,2 %), Melilla (-35,1 %) y Cantabria (-28,1 %), y solo ha subido en Illes Balears, Aragón, La Rioja y Andalucía. Sin Ceuta y Melilla, la media pasa de 2,8 a 2,5. El orden de las comunidades casi no cambia, y con estos datos no podemos explicar por qué baja la luz.
+La prevalencia de diabetes diagnosticada va del 5,08 % de Cataluña al 9,89 % de Melilla, con una media de 7,75 %. Por sexo, la prevalencia media es del 7,97 % en los hombres y del 7,54 % en las mujeres, y en 13 de los 19 territorios es mayor en los hombres. La mayor diferencia a favor de los hombres se da en la Región de Murcia (4,39 puntos porcentuales) y la mayor a favor de las mujeres en Ceuta (8,39 puntos), un valor extremo en una ciudad pequeña al que conviene no dar demasiado peso.
 
-**Objetivo 3: renta.** La renta neta media por persona va de los 11.314 € de la Región de Murcia a los 18.189 € del País Vasco. Los territorios de renta alta (por encima de la mediana, 14.124 €) tienen una prevalencia media de diabetes del 6,64 %, frente al 8,75 % de los de renta baja. La diferencia es de 2,11 puntos porcentuales, unas cinco veces mayor que la que se obtiene al partir por la luz (0,42 puntos).
+### Objetivo 2: distribución y evolución de la luz nocturna
 
-**Objetivo 4: comparación según la luz nocturna.** Tomando como corte la mediana de luz (1,70), los 9 territorios de luz alta tienen una prevalencia media del 7,53 % y los 10 de luz baja del 7,95 %. La diferencia, de 0,42 puntos, va en sentido contrario al que cabría esperar si la luz aumentase el riesgo. Hay más variación dentro de cada grupo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja) que entre ellos, así que saber cuánta luz tiene un territorio no ayuda a predecir su prevalencia de diabetes.
+La luz es muy desigual: va de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y Melilla son casos extremos (ciudades pequeñas casi sin campo alrededor) y elevan la media del conjunto de 2,5 a 7,94. Las comunidades más iluminadas, sin contar esas dos, son las de grandes ciudades o costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior rural (Extremadura y las dos Castillas). Entre 2012 y 2023 la luz ha bajado en 15 de los 19 territorios, sobre todo en Ceuta (-37,2 %), Melilla (-35,1 %) y Cantabria (-28,1 %), y solo ha subido en Illes Balears, Aragón, La Rioja y Andalucía. Sin Ceuta y Melilla, la media pasa de 2,8 a 2,5. El orden de las comunidades casi no cambia, y con estos datos no podemos explicar por qué baja la luz.
+
+### Objetivo 3: renta
+
+La renta neta media por persona (ingresos de 2022, encuesta de 2023) va de los 11.314 € de la Región de Murcia a los 18.189 € del País Vasco. Los territorios de renta alta (por encima de la mediana, 14.124 €) tienen una prevalencia media de diabetes del 6,64 %, frente al 8,75 % de los de renta baja. La diferencia es de 2,11 puntos porcentuales, unas cinco veces mayor que la que se obtiene al partir por la luz (0,42 puntos).
+
+### Objetivo 4: comparación según la luz nocturna
+
+Tomando como corte la mediana de luz (1,70), los 9 territorios de luz alta tienen una prevalencia media del 7,53 % y los 10 de luz baja del 7,95 %. La diferencia, de 0,42 puntos, va en sentido contrario al que cabría esperar si la luz aumentase el riesgo. Hay más variación dentro de cada grupo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja) que entre ellos, así que saber cuánta luz tiene un territorio no ayuda a predecir su prevalencia de diabetes.
 
 ## Comparación con los estudios de China
 
@@ -416,34 +426,36 @@ Los dos estudios que citamos en la introducción encontraron una asociación pos
 
 Esto no significa que nuestros datos contradigan esos trabajos, porque los estudios no son comparables:
 
-- **Unidad de análisis.** Ellos trabajan con datos de personas (Xu et al. con un seguimiento de varios años); nosotros, con la prevalencia media de 19 territorios, que es un estudio ecológico.
-- **Tamaño y detalle.** Ellos comparan 162 zonas y casi 100.000 o 300.000 personas; nosotros, 19 territorios, y la luz de cada comunidad es la media de sus provincias, que esconde las diferencias entre zonas urbanas y rurales dentro de la misma comunidad.
-- **Otros factores.** Nuestro análisis es descriptivo y no controla la edad, la urbanización ni la renta. En nuestros datos la renta sí separa mucho mejor a los territorios que la luz, lo que muestra que otros factores pesan más a este nivel.
-- **Contexto.** Se trata de países distintos, con otros niveles de luz, de urbanización y de sistema sanitario.
+- Unidad de análisis. Ellos trabajan con datos de personas (Xu et al. con un seguimiento de varios años); nosotros, con la prevalencia media de 19 territorios, que es un estudio ecológico.
+- Tamaño y detalle. Ellos estudian a casi 100.000 personas de 162 zonas (Zheng et al.) y a más de 280.000 (Xu et al.); nosotros, 19 territorios, y la luz de cada comunidad es la media de sus provincias, que esconde las diferencias entre zonas urbanas y rurales dentro de la misma comunidad.
+- Otros factores. Nuestro análisis es descriptivo y no controla la edad, la urbanización ni la renta. En nuestros datos la renta sí separa mucho mejor a los territorios que la luz, lo que muestra que otros factores pesan más a este nivel.
+- Contexto. Se trata de países distintos, con otros niveles de luz, de urbanización y de sistema sanitario.
 
 ## Limitaciones
 
-1. **Pocos datos.** Solo hay 19 territorios (17 comunidades más Ceuta y Melilla). Con tan pocas observaciones los resultados son poco estables y es difícil detectar diferencias pequeñas. Dos valores extremos, como Ceuta y Melilla, condicionan el reparto por la mediana.
+1. Pocos datos. Solo hay 19 territorios (17 comunidades más Ceuta y Melilla). Con tan pocas observaciones los resultados son poco estables y es difícil detectar diferencias pequeñas. Dos valores extremos, como Ceuta y Melilla, condicionan el reparto por la mediana.
 
-2. **Estudio ecológico.** Los datos describen territorios enteros, no personas. Una asociación (o la falta de ella) entre territorios no permite hablar de causa y efecto ni afirmar nada sobre el riesgo individual. Otros factores que varían entre comunidades, como la edad de la población, el nivel de renta o el estilo de vida, pueden influir en la diabetes y confundir el resultado.
+2. Estudio ecológico. Los datos describen territorios enteros, no personas. Una asociación (o la falta de ella) entre territorios no permite hablar de causa y efecto ni afirmar nada sobre el riesgo individual. Otros factores que varían entre comunidades, como la edad de la población, el nivel de renta o el estilo de vida, pueden influir en la diabetes y confundir el resultado.
 
-3. **La luz del satélite no es la que recibe cada persona.** El satélite mide el brillo que sube desde el suelo, promediado por píxel y por provincia. No mide la luz que llega a cada persona, ni cuánto tiempo está expuesta, ni si duerme con luz en la habitación.
+3. La luz del satélite no es la que recibe cada persona. El satélite mide el brillo que sube desde el suelo, promediado por píxel y por provincia. No mide la luz que llega a cada persona, ni cuánto tiempo está expuesta, ni si duerme con luz en la habitación.
 
-4. **La diabetes es autodeclarada.** Los datos proceden de una encuesta en la que las propias personas dicen si tienen diabetes. Puede haber casos sin diagnosticar y diferencias entre comunidades en el acceso a la sanidad, así que no equivale a un registro clínico.
+4. La diabetes es autodeclarada. Los datos proceden de una encuesta en la que las propias personas dicen si tienen diabetes. Puede haber casos sin diagnosticar y diferencias entre comunidades en el acceso a la sanidad, así que no equivale a un registro clínico.
 
 Además, el análisis es descriptivo: dividir los territorios por la mediana de luz simplifica los datos, y la luz de cada comunidad es la media simple de sus provincias, sin ponderar por superficie ni población.
 
 ## Conclusión final
 
-Por todo ello, nuestros resultados no permiten confirmar ni descartar lo que encuentran los estudios de China. Lo único que indican es que, entre las comunidades españolas, la luz nocturna por sí sola no distingue a las que tienen más diabetes de las que tienen menos.
-
-Con los datos disponibles, la iluminación nocturna no permite distinguir las comunidades con más diabetes de las que tienen menos. Para estudiar esta cuestión con más garantías haría falta trabajar con datos individuales, con más unidades territoriales y tener en cuenta factores como la edad y el nivel socioeconómico.
+Nuestros resultados no permiten confirmar ni descartar lo que encuentran los estudios de China. Lo único que indican es que, entre las comunidades españolas, la luz nocturna por sí sola no distingue a las que tienen más diabetes de las que tienen menos. Para estudiar esta cuestión con más garantías haría falta trabajar con datos individuales, con más unidades territoriales y tener en cuenta factores como la edad y el nivel socioeconómico.
 
 # Referencias
 
 Banco Mundial. (s. f.). *Space2Stats Monthly & Annual Black Marble Nighttime Lights* (versión 2) [Conjunto de datos]. Recuperado el 19 de noviembre de 2026, de https://datacatalog.worldbank.org/search/dataset/0066940
 
-Instituto Nacional de Estadística. (s. f.). *Problemas o enfermedades crónicas o de larga evolución padecidas en los últimos 12 meses y diagnosticadas por un médico en población adulta según sexo y comunidad autónoma. Población de 15 y más años* (Encuesta de Salud de España 2023, tabla 71554) [Conjunto de datos]. Recuperado el 19 de noviembre de 2026, de https://www.ine.es/jaxi/Tabla.htm?L=0&tpx=71554
+Instituto Nacional de Estadística. (s. f.-a). *API JSON: servicio web para la consulta de INEbase con salida en formato JSON* [Servicio web]. Recuperado el 22 de noviembre de 2026, de https://www.ine.es/dyngs/DAB/index.htm?cid=1099
+
+Instituto Nacional de Estadística. (s. f.-b). *Problemas o enfermedades crónicas o de larga evolución padecidas en los últimos 12 meses y diagnosticadas por un médico en población adulta según sexo y comunidad autónoma. Población de 15 y más años* (Encuesta de Salud de España 2023, tabla 71554) [Conjunto de datos]. Recuperado el 19 de noviembre de 2026, de https://www.ine.es/jaxi/Tabla.htm?L=0&tpx=71554
+
+Instituto Nacional de Estadística. (s. f.-c). *Renta por persona y unidad de consumo por comunidades autónomas* (Encuesta de Condiciones de Vida, tabla 9947) [Conjunto de datos]. Recuperado el 22 de noviembre de 2026, de https://www.ine.es/jaxiT3/Tabla.htm?t=9947
 
 Meléndez-Fernández, O. H., Liu, J. A. y Nelson, R. J. (2023). Circadian rhythms disrupted by light at night and mistimed food intake alter hormonal rhythms and metabolism. *International Journal of Molecular Sciences*, *24*(4), 3392. https://doi.org/10.3390/ijms24043392
 

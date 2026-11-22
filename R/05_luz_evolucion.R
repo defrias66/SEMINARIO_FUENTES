@@ -9,16 +9,9 @@ library(readr)
 library(dplyr)
 
 # * Cargar datos ----------------------------------------------------------
-# Si la tabla mundial no está en INPUT/DATA, se descarga (tarda un rato).
-options(timeout = 1800)
-archivo <- "INPUT/DATA/ntl_adm2_annual.csv"
-if (!file.exists(archivo)) {
-  download.file(url = "https://datacatalogfiles.worldbank.org/ddh-published/0066940/DR0095685/ntl_adm2_annual.csv",
-                destfile = archivo,
-                mode = "wb")
-}
-
-luz_mundo <- read_csv(archivo)
+# La tabla mundial la descarga R/02_datos_luz.R en INPUT/DATA. Hay que
+# ejecutar ese script antes que este.
+luz_mundo <- read_csv("INPUT/DATA/ntl_adm2_annual.csv")
 
 # * Filtrar España y los años del estudio ----------------------------------
 luz_esp <- luz_mundo %>%
@@ -51,15 +44,14 @@ luz_esp <- luz_esp %>%
 luz_evolucion <- luz_esp %>%
   group_by(comunidad, year) %>%
   summarise(luz_media = round(mean(ntl_mean), 2),
-            n_provincias = n(),
-            .groups = "drop") %>%
+            n_provincias = n()) %>%
   rename(anio = year) %>%
   arrange(comunidad, anio)
 
 # * Comprobación ----------------------------------------------------------
-# Tienen que salir 19 comunidades x 12 años = 228 filas, sin NA.
-nrow(luz_evolucion)
-sum(is.na(luz_evolucion))
+# Tienen que salir 19 comunidades con 12 años cada una (228 filas), sin NA.
+count(luz_evolucion, comunidad)
+summary(luz_evolucion)
 
 # * Exportación -----------------------------------------------------------
 write_csv(x = luz_evolucion, file = "OUTPUT/DATA/luz_ccaa_2012_2023.csv", col_names = TRUE)
