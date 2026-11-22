@@ -400,13 +400,26 @@ Esa línea es solo descriptiva, no un modelo estadístico, y no debe leerse como
 
 ## Respuesta al objetivo general
 
-El objetivo del trabajo era comprobar si la iluminación artificial nocturna se relaciona con la diabetes en las comunidades autónomas de España en 2023. Con los datos analizados, **no encontramos evidencia de que los territorios con más luz nocturna tengan más diabetes**.
+El objetivo era comprobar si la exposición a luz artificial nocturna se relaciona con la prevalencia de diabetes en las comunidades y ciudades autónomas de España en 2023. Con los datos analizados, **no encontramos evidencia de que los territorios con más luz nocturna tengan más diabetes**. Los más iluminados tienen una prevalencia media algo menor (7,53 %) que los menos iluminados (7,95 %), y los dos grupos se solapan por completo. Esto no demuestra que la relación no exista, solo que este análisis no la detecta. Además, la renta separa a los territorios mucho mejor que la luz.
 
-- **Diabetes (objetivo 1).** La prevalencia va del 5,08 % de Cataluña al 9,89 % de Melilla, con una media de `r format(round(mean(luz_diabetes$diabetes_pct), 2), decimal.mark = ",")` %.
-- **Luz nocturna (objetivo 2).** La luz es muy desigual entre territorios: de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y Melilla son casos extremos (ciudades pequeñas, casi enteramente urbanas) y elevan mucho la media, que pasa de 7,94 a 2,5 al quitarlas.
-- **Relación entre ambas (objetivo 4).** Los territorios más iluminados tienen una prevalencia media del 7,53 %, frente al 7,95 % de los menos iluminados. La diferencia es de 0,42 puntos y va en sentido contrario al esperado. Además, los dos grupos se solapan por completo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja): hay más variación dentro de cada grupo que entre ellos.
+**Objetivo 1: diabetes por comunidad y sexo.** La prevalencia de diabetes diagnosticada va del 5,08 % de Cataluña al 9,89 % de Melilla, con una media de 7,75 % y una mediana de 7,83 %. Por sexo, la prevalencia media es del `r format(round(media_h, 2), decimal.mark = ",")` % en los hombres y del `r format(round(media_m, 2), decimal.mark = ",")` % en las mujeres. En `r n_h_mayor` de los 19 territorios la prevalencia es mayor en hombres. La mayor diferencia a favor de los hombres se da en `r com_dif_max` (`r format(dif_max, decimal.mark = ",")` puntos porcentuales) y la mayor a favor de las mujeres en `r com_dif_min` (`r format(abs(dif_min), decimal.mark = ",")` puntos). Este último es un valor extremo en una ciudad pequeña, donde la muestra de la encuesta es reducida, por lo que conviene no darle demasiado peso.
 
-En conjunto, saber cuánta luz nocturna tiene una comunidad no ayuda a predecir su prevalencia de diabetes. Esto no demuestra que la relación no exista, solo que este análisis no la detecta.
+**Objetivo 2: distribución y evolución de la luz nocturna.** La luz es muy desigual: va de 0,37 en Extremadura a 73,17 en Melilla. Ceuta y Melilla son casos extremos (ciudades pequeñas casi sin campo alrededor) y elevan la media del conjunto de 2,5 a 7,94. Las comunidades más iluminadas, sin contar esas dos, son las de grandes ciudades o costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior rural (Extremadura y las dos Castillas). Entre 2012 y 2023 la luz ha bajado en 15 de los 19 territorios, sobre todo en Ceuta (-37,2 %), Melilla (-35,1 %) y Cantabria (-28,1 %), y solo ha subido en Illes Balears, Aragón, La Rioja y Andalucía. Sin Ceuta y Melilla, la media pasa de 2,8 a 2,5. El orden de las comunidades casi no cambia, y con estos datos no podemos explicar por qué baja la luz.
+
+**Objetivo 3: renta.** La renta neta media por persona va de los 11.314 € de la Región de Murcia a los 18.189 € del País Vasco. Los territorios de renta alta (por encima de la mediana, 14.124 €) tienen una prevalencia media de diabetes del 6,64 %, frente al 8,75 % de los de renta baja. La diferencia es de 2,11 puntos porcentuales, unas cinco veces mayor que la que se obtiene al partir por la luz (0,42 puntos).
+
+**Objetivo 4: comparación según la luz nocturna.** Tomando como corte la mediana de luz (1,70), los 9 territorios de luz alta tienen una prevalencia media del 7,53 % y los 10 de luz baja del 7,95 %. La diferencia, de 0,42 puntos, va en sentido contrario al que cabría esperar si la luz aumentase el riesgo. Hay más variación dentro de cada grupo (del 5,08 % al 9,89 % en el de luz alta y del 6,07 % al 9,39 % en el de luz baja) que entre ellos, así que saber cuánta luz tiene un territorio no ayuda a predecir su prevalencia de diabetes.
+
+## Comparación con los estudios de China
+
+Los dos estudios que citamos en la introducción encontraron una asociación positiva entre la luz nocturna y la diabetes. Zheng et al. (2023) observaron, en 162 zonas, que la diabetes era un 28 % más frecuente donde había más luz, y Xu et al. (2023), siguiendo a 283.374 personas, que vivir en las zonas más iluminadas aumentaba el riesgo de diabetes tipo 2. Nosotros no reproducimos ese resultado: en España los territorios más iluminados tienen una prevalencia aproximadamente un 5 % menor que los menos iluminados.
+
+Esto no significa que nuestros datos contradigan esos trabajos, porque los estudios no son comparables:
+
+- **Unidad de análisis.** Ellos trabajan con datos de personas (Xu et al. con un seguimiento de varios años); nosotros, con la prevalencia media de 19 territorios, que es un estudio ecológico.
+- **Tamaño y detalle.** Ellos comparan 162 zonas y casi 100.000 o 300.000 personas; nosotros, 19 territorios, y la luz de cada comunidad es la media de sus provincias, que esconde las diferencias entre zonas urbanas y rurales dentro de la misma comunidad.
+- **Otros factores.** Nuestro análisis es descriptivo y no controla la edad, la urbanización ni la renta. En nuestros datos la renta sí separa mucho mejor a los territorios que la luz, lo que muestra que otros factores pesan más a este nivel.
+- **Contexto.** Se trata de países distintos, con otros niveles de luz, de urbanización y de sistema sanitario.
 
 ## Limitaciones
 
@@ -421,6 +434,8 @@ En conjunto, saber cuánta luz nocturna tiene una comunidad no ayuda a predecir 
 Además, el análisis es descriptivo: dividir los territorios por la mediana de luz simplifica los datos, y la luz de cada comunidad es la media simple de sus provincias, sin ponderar por superficie ni población.
 
 ## Conclusión final
+
+Por todo ello, nuestros resultados no permiten confirmar ni descartar lo que encuentran los estudios de China. Lo único que indican es que, entre las comunidades españolas, la luz nocturna por sí sola no distingue a las que tienen más diabetes de las que tienen menos.
 
 Con los datos disponibles, la iluminación nocturna no permite distinguir las comunidades con más diabetes de las que tienen menos. Para estudiar esta cuestión con más garantías haría falta trabajar con datos individuales, con más unidades territoriales y tener en cuenta factores como la edad y el nivel socioeconómico.
 
