@@ -1,0 +1,229 @@
+comunidad,anio,luz_media,n_provincias
+Andalucía,2012,1.69,8
+Andalucía,2013,1.59,8
+Andalucía,2014,1.59,8
+Andalucía,2015,1.55,8
+Andalucía,2016,1.53,8
+Andalucía,2017,1.55,8
+Andalucía,2018,1.55,8
+Andalucía,2019,1.56,8
+Andalucía,2020,1.56,8
+Andalucía,2021,1.65,8
+Andalucía,2022,1.67,8
+Andalucía,2023,1.7,8
+Aragón,2012,0.57,3
+Aragón,2013,0.54,3
+Aragón,2014,0.54,3
+Aragón,2015,0.53,3
+Aragón,2016,0.52,3
+Aragón,2017,0.53,3
+Aragón,2018,0.53,3
+Aragón,2019,0.55,3
+Aragón,2020,0.54,3
+Aragón,2021,0.56,3
+Aragón,2022,0.58,3
+Aragón,2023,0.62,3
+"Asturias, Principado de",2012,1.55,1
+"Asturias, Principado de",2013,1.43,1
+"Asturias, Principado de",2014,1.42,1
+"Asturias, Principado de",2015,1.4,1
+"Asturias, Principado de",2016,1.33,1
+"Asturias, Principado de",2017,1.25,1
+"Asturias, Principado de",2018,1.29,1
+"Asturias, Principado de",2019,1.24,1
+"Asturias, Principado de",2020,1.21,1
+"Asturias, Principado de",2021,1.27,1
+"Asturias, Principado de",2022,1.27,1
+"Asturias, Principado de",2023,1.24,1
+"Balears, Illes",2012,2.87,1
+"Balears, Illes",2013,2.76,1
+"Balears, Illes",2014,2.74,1
+"Balears, Illes",2015,2.77,1
+"Balears, Illes",2016,2.83,1
+"Balears, Illes",2017,2.86,1
+"Balears, Illes",2018,2.82,1
+"Balears, Illes",2019,2.84,1
+"Balears, Illes",2020,2.83,1
+"Balears, Illes",2021,2.98,1
+"Balears, Illes",2022,3.04,1
+"Balears, Illes",2023,3.13,1
+Canarias,2012,3.66,2
+Canarias,2013,3.53,2
+Canarias,2014,3.39,2
+Canarias,2015,3.39,2
+Canarias,2016,3.38,2
+Canarias,2017,3.36,2
+Canarias,2018,3.28,2
+Canarias,2019,3.3,2
+Canarias,2020,3.2,2
+Canarias,2021,3.21,2
+Canarias,2022,3.32,2
+Canarias,2023,3.43,2
+Cantabria,2012,2.31,1
+Cantabria,2013,2.17,1
+Cantabria,2014,2.17,1
+Cantabria,2015,2.12,1
+Cantabria,2016,2.04,1
+Cantabria,2017,1.87,1
+Cantabria,2018,1.65,1
+Cantabria,2019,1.66,1
+Cantabria,2020,1.55,1
+Cantabria,2021,1.59,1
+Cantabria,2022,1.62,1
+Cantabria,2023,1.66,1
+Castilla y León,2012,0.54,9
+Castilla y León,2013,0.49,9
+Castilla y León,2014,0.48,9
+Castilla y León,2015,0.47,9
+Castilla y León,2016,0.46,9
+Castilla y León,2017,0.47,9
+Castilla y León,2018,0.46,9
+Castilla y León,2019,0.46,9
+Castilla y León,2020,0.45,9
+Castilla y León,2021,0.46,9
+Castilla y León,2022,0.48,9
+Castilla y León,2023,0.51,9
+Castilla-La Mancha,2012,0.54,5
+Castilla-La Mancha,2013,0.5,5
+Castilla-La Mancha,2014,0.51,5
+Castilla-La Mancha,2015,0.5,5
+Castilla-La Mancha,2016,0.47,5
+Castilla-La Mancha,2017,0.48,5
+Castilla-La Mancha,2018,0.47,5
+Castilla-La Mancha,2019,0.48,5
+Castilla-La Mancha,2020,0.46,5
+Castilla-La Mancha,2021,0.49,5
+Castilla-La Mancha,2022,0.5,5
+Castilla-La Mancha,2023,0.52,5
+Cataluña,2012,3.79,4
+Cataluña,2013,3.64,4
+Cataluña,2014,3.58,4
+Cataluña,2015,3.53,4
+Cataluña,2016,3.45,4
+Cataluña,2017,3.51,4
+Cataluña,2018,3.48,4
+Cataluña,2019,3.49,4
+Cataluña,2020,3.43,4
+Cataluña,2021,3.5,4
+Cataluña,2022,3.59,4
+Cataluña,2023,3.68,4
+Ceuta,2012,55.84,1
+Ceuta,2013,54.28,1
+Ceuta,2014,55.66,1
+Ceuta,2015,52.42,1
+Ceuta,2016,51.24,1
+Ceuta,2017,49.63,1
+Ceuta,2018,49.56,1
+Ceuta,2019,43.54,1
+Ceuta,2020,38.48,1
+Ceuta,2021,36.68,1
+Ceuta,2022,36.43,1
+Ceuta,2023,35.04,1
+Comunitat Valenciana,2012,4.56,3
+Comunitat Valenciana,2013,4.22,3
+Comunitat Valenciana,2014,4.12,3
+Comunitat Valenciana,2015,4,3
+Comunitat Valenciana,2016,3.93,3
+Comunitat Valenciana,2017,3.98,3
+Comunitat Valenciana,2018,4.02,3
+Comunitat Valenciana,2019,4.04,3
+Comunitat Valenciana,2020,3.98,3
+Comunitat Valenciana,2021,4.04,3
+Comunitat Valenciana,2022,4.04,3
+Comunitat Valenciana,2023,4.15,3
+Extremadura,2012,0.38,2
+Extremadura,2013,0.35,2
+Extremadura,2014,0.35,2
+Extremadura,2015,0.35,2
+Extremadura,2016,0.34,2
+Extremadura,2017,0.33,2
+Extremadura,2018,0.33,2
+Extremadura,2019,0.31,2
+Extremadura,2020,0.31,2
+Extremadura,2021,0.33,2
+Extremadura,2022,0.35,2
+Extremadura,2023,0.37,2
+Galicia,2012,1.65,4
+Galicia,2013,1.52,4
+Galicia,2014,1.54,4
+Galicia,2015,1.46,4
+Galicia,2016,1.49,4
+Galicia,2017,1.42,4
+Galicia,2018,1.42,4
+Galicia,2019,1.5,4
+Galicia,2020,1.43,4
+Galicia,2021,1.47,4
+Galicia,2022,1.56,4
+Galicia,2023,1.59,4
+"Madrid, Comunidad de",2012,12.04,1
+"Madrid, Comunidad de",2013,11.42,1
+"Madrid, Comunidad de",2014,11.29,1
+"Madrid, Comunidad de",2015,9.63,1
+"Madrid, Comunidad de",2016,9.3,1
+"Madrid, Comunidad de",2017,9.4,1
+"Madrid, Comunidad de",2018,9.38,1
+"Madrid, Comunidad de",2019,9.26,1
+"Madrid, Comunidad de",2020,9.38,1
+"Madrid, Comunidad de",2021,9.83,1
+"Madrid, Comunidad de",2022,9.8,1
+"Madrid, Comunidad de",2023,9.84,1
+Melilla,2012,112.76,1
+Melilla,2013,110.51,1
+Melilla,2014,111.65,1
+Melilla,2015,105.66,1
+Melilla,2016,109.82,1
+Melilla,2017,106.59,1
+Melilla,2018,101.45,1
+Melilla,2019,91.78,1
+Melilla,2020,83.57,1
+Melilla,2021,76.28,1
+Melilla,2022,72.09,1
+Melilla,2023,73.17,1
+"Murcia, Región de",2012,3.18,1
+"Murcia, Región de",2013,3.01,1
+"Murcia, Región de",2014,2.95,1
+"Murcia, Región de",2015,2.83,1
+"Murcia, Región de",2016,2.79,1
+"Murcia, Región de",2017,2.8,1
+"Murcia, Región de",2018,2.88,1
+"Murcia, Región de",2019,2.9,1
+"Murcia, Región de",2020,2.81,1
+"Murcia, Región de",2021,2.96,1
+"Murcia, Región de",2022,2.98,1
+"Murcia, Región de",2023,3.12,1
+"Navarra, Comunidad Foral de",2012,1.39,1
+"Navarra, Comunidad Foral de",2013,1.29,1
+"Navarra, Comunidad Foral de",2014,1.26,1
+"Navarra, Comunidad Foral de",2015,1.26,1
+"Navarra, Comunidad Foral de",2016,1.22,1
+"Navarra, Comunidad Foral de",2017,1.24,1
+"Navarra, Comunidad Foral de",2018,1.19,1
+"Navarra, Comunidad Foral de",2019,1.21,1
+"Navarra, Comunidad Foral de",2020,1.15,1
+"Navarra, Comunidad Foral de",2021,1.21,1
+"Navarra, Comunidad Foral de",2022,1.28,1
+"Navarra, Comunidad Foral de",2023,1.25,1
+País Vasco,2012,5.3,3
+País Vasco,2013,5.02,3
+País Vasco,2014,4.94,3
+País Vasco,2015,4.74,3
+País Vasco,2016,4.48,3
+País Vasco,2017,4.39,3
+País Vasco,2018,4.29,3
+País Vasco,2019,4.31,3
+País Vasco,2020,4.12,3
+País Vasco,2021,4.27,3
+País Vasco,2022,4.38,3
+País Vasco,2023,4.21,3
+"Rioja, La",2012,1.53,1
+"Rioja, La",2013,1.41,1
+"Rioja, La",2014,1.37,1
+"Rioja, La",2015,1.39,1
+"Rioja, La",2016,1.35,1
+"Rioja, La",2017,1.44,1
+"Rioja, La",2018,1.45,1
+"Rioja, La",2019,1.51,1
+"Rioja, La",2020,1.45,1
+"Rioja, La",2021,1.52,1
+"Rioja, La",2022,1.53,1
+"Rioja, La",2023,1.56,1

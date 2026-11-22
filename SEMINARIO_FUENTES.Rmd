@@ -148,6 +148,59 @@ Ceuta y Melilla salen tan altas porque son ciudades pequeñas casi sin campo alr
 
 Sin contar Ceuta y Melilla, las comunidades más iluminadas son las que tienen grandes ciudades o mucha costa urbanizada (Madrid, País Vasco, Comunitat Valenciana y Cataluña), y las menos iluminadas son las del interior con mucho territorio rural y poca población (Extremadura y las dos Castillas).
 
+### Luz nocturna en 2023
+
+```{r luz_grafico_2023, fig.height=6, fig.width=8}
+ggplot(luz, aes(x = reorder(comunidad, luz_media), y = luz_media)) +
+  geom_col(fill = "darkorange") +
+  geom_text(aes(label = luz_media), hjust = -0.2, size = 3) +
+  expand_limits(y = 80) +
+  coord_flip() +
+  labs(title = "Luz artificial nocturna por comunidad autónoma (2023)",
+       subtitle = "Brillo medio por píxel (media de las provincias)",
+       x = NULL,
+       y = "Luz nocturna") +
+  theme_minimal()
+```
+
+En el gráfico se ve lo mismo que en las tablas: Melilla y Ceuta están muy por encima del resto, y las otras diecisiete comunidades quedan por debajo de 10.
+
+### Evolución entre 2012 y 2023
+
+Para ver si la luz nocturna ha cambiado con el tiempo usamos la misma tabla del Banco Mundial, que tiene datos de todos los años desde 2012. En el script `R/05_luz_evolucion.R` hacemos lo mismo que en el paso 5 (brillo medio por píxel y media de las provincias de cada comunidad), pero para cada año entre 2012 y 2023. El resultado está en `OUTPUT/DATA/luz_ccaa_2012_2023.csv`.
+
+```{r luz_evolucion_leer}
+luz_evolucion <- read_csv("OUTPUT/DATA/luz_ccaa_2012_2023.csv")
+
+# Comparamos el primer año (2012) con el último (2023)
+cambio_luz <- luz_evolucion %>%
+  filter(anio == 2012 | anio == 2023) %>%
+  select(comunidad, anio, luz_media) %>%
+  pivot_wider(names_from = anio, values_from = luz_media) %>%
+  mutate(cambio_pct = round((`2023` - `2012`) / `2012` * 100, 1)) %>%
+  arrange(desc(cambio_pct))
+
+knitr::kable(cambio_luz,
+             col.names = c("Comunidad", "Luz 2012", "Luz 2023", "Cambio (%)"),
+             caption = "Luz nocturna en 2012 y en 2023 y cambio entre los dos años")
+```
+
+```{r luz_evolucion_grafico, fig.height=9, fig.width=9}
+ggplot(luz_evolucion, aes(x = anio, y = luz_media)) +
+  geom_point(colour = "darkorange", size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, colour = "grey40", linewidth = 0.6) +
+  facet_wrap(~ comunidad, ncol = 4, scales = "free_y") +
+  labs(title = "Evolución de la luz nocturna por comunidad autónoma (2012-2023)",
+       subtitle = "Cada panel tiene su propia escala vertical. La línea gris marca la tendencia",
+       x = "Año",
+       y = "Luz nocturna") +
+  theme_minimal()
+```
+
+Entre 2012 y 2023 la luz nocturna ha bajado en 15 de los 19 territorios. Las mayores bajadas son las de Ceuta (-37,2 %), Melilla (-35,1 %), Cantabria (-28,1 %), País Vasco (-20,6 %), Asturias (-20,0 %) y Madrid (-18,3 %). Solo sube en Illes Balears (9,1 %), Aragón (8,8 %), La Rioja (2,0 %) y Andalucía (0,6 %). Sin contar Ceuta y Melilla, la media de las 17 comunidades pasa de 2,8 en 2012 a 2,5 en 2023, con el valor más bajo en 2020 (2,34). Con los datos que tenemos no podemos saber por qué baja la luz.
+
+Aunque los valores cambian, el orden de las comunidades casi no cambia: en 2012 y en 2023 las más iluminadas son Melilla, Ceuta y Madrid, y las menos iluminadas, Extremadura y las dos Castillas. Esto es importante para el objetivo 4, porque quiere decir que usar solo los datos de 2023 no cambia qué comunidades tienen mucha luz y cuáles poca.
+
 ## Objetivo 3: Renta por comunidad autónoma
 
 Pendiente (mejora 5).
