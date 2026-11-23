@@ -2,7 +2,15 @@
 title: "Iluminación artificial nocturna y diabetes en las comunidades autónomas de España (2023)"
 author: "Diego Medel, Pablo de Frías y Mikel Lasa"
 date: "23 de noviembre de 2026"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: flatly
+    highlight: tango
+    code_folding: show
+    df_print: paged
 ---
 
 Fuentes de Datos Biomédicos y Web Semántica. 3.º del grado de Ingeniería de la Salud, Universidad de Burgos. Curso 2026-2027.
