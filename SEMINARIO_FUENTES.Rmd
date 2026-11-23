@@ -12,6 +12,59 @@ output:
     code_folding: show
     df_print: paged
 ---
+<style>
+body {
+  background-image: url("INPUT/Imagenes/portada.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+.main-container {
+  background-color: transparent;
+  box-shadow: none;
+}
+.main-container, .main-container h1, .main-container h2, .main-container h3,
+.main-container p, .main-container li, .main-container td, .main-container th {
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+}
+.main-container table {
+  background-color: rgba(0, 0, 0, 0.45);
+  border-radius: 6px;
+  padding: 6px;
+}
+#TOC {
+  background-color: rgba(0, 0, 0, 0.55);
+  padding: 12px;
+  border-radius: 8px;
+}
+#TOC .list-group-item {
+  background-color: transparent;
+  border: none;
+}
+#TOC .list-group-item.active {
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+#TOC a {
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+}
+.main-container pre {
+  background-color: #0b1016;
+  border: 2px solid #e8a33d;
+  border-radius: 6px;
+  padding: 12px;
+}
+.main-container pre code,
+.main-container pre code span,
+.main-container pre span {
+  color: #ffffff !important;
+  text-shadow: none;
+  font-weight: normal;
+}
+</style>
 
 Fuentes de Datos Biomédicos y Web Semántica. 3.º del grado de Ingeniería de la Salud, Universidad de Burgos. Curso 2026-2027.
 
